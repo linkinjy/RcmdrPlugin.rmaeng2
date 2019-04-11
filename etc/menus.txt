@@ -1,0 +1,13 @@
+# RcmdrPlugin.Rmaeng2 Menu Definitions
+
+# published 00 April 2019 by Hankuk University of Foreign Studies IME : Rmaeng2
+
+#  type(5)      menu/item(12)       operation/parent(13)       label(15)                                        command/menu(20)       activation(16)       install?
+
+   menu    rmaeng2Menu                topMenu             " "                                                                 " "                    " "                " "
+   item     topMenu                       cascade             "rmaeng2"                                                 rmaeng2Menu                    " "                " "
+
+
+## rmaeng2
+
+   item     rmaeng2Menu                 command            "Anova"                                                   "anova_menu"                    " "                " "
