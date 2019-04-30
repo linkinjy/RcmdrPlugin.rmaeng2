@@ -10,4 +10,6 @@
 
 ## rmaeng2
 
-   item     rmaeng2Menu                 command            "Anova"                                                   "anova_menu"                    " "                " "
+   menu    analyzeDesign                 rmaeng2Menu           "   "                                                          " "                      " "                " "
+   item     analyzeDesign                 command            "Anova"                                                   anova_menu	                    " "                " "
+   item     rmaeng2Menu                 cascade              "Analyze Design"                                        analyzeDesign                          " "                " "
