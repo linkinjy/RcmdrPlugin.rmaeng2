@@ -2,14 +2,14 @@
 
 # published 00 April 2019 by Hankuk University of Foreign Studies IME : Rmaeng2
 
-#  type(5)      menu/item(12)       operation/parent(13)       label(15)                                        command/menu(20)       activation(16)       install?
+#  type          menu/item                operation/parent       label                                                     command/menu             activation            install?
 
-   menu    rmaeng2Menu                topMenu             " "                                                                 " "                    " "                " "
-   item     topMenu                       cascade             "rmaeng2"                                                 rmaeng2Menu                    " "                " "
+   menu        rmaeng2Menu                topMenu             " "                                                                 " "                            " "               " "
+   item         topMenu                       cascade             "rmaeng2"                                                 rmaeng2Menu                    " "                " "
 
 
 ## rmaeng2
 
-   menu    analyzeDesign                 rmaeng2Menu           "   "                                                          " "                      " "                " "
-   item     analyzeDesign                 command            "Anova"                                                   anova_menu	                    " "                " "
-   item     rmaeng2Menu                 cascade              "Analyze Design"                                        analyzeDesign                          " "                " "
+   menu        analyzeDesign                 rmaeng2Menu           " "                                                          " "                            " "                " "
+   item         rmaeng2Menu                 cascade              "Analyze Design"                                        analyzeDesign                     " "                " "
+   item         analyzeDesign                 command            "Anova"                                                   "anova_menu"	               " "                " "
