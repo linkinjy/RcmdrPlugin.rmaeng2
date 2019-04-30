@@ -12,4 +12,4 @@
 
    menu        analyzeDesign                 rmaeng2Menu           " "                                                          " "                            " "                " "
    item         rmaeng2Menu                 cascade              "Analyze Design"                                        analyzeDesign                     " "                " "
-   item         analyzeDesign                 command            "Anova"                                                   "anova_menu"	               " "                " "
+   item         analyzeDesign                 command            "Anova"                                                   "anova_menu"	               " "                "packageAvailable('REST')"
