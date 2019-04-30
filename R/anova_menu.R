@@ -19,6 +19,7 @@
 }
 
 anova_menu <- function(list.info=list()){
+  require(REST)
   ##########################
   ## PREAMBLE/INFORMATION ##
   ##########################
