@@ -1,4 +1,4 @@
 exportPattern("^[^\\.]")
 
-export(.add.frame,.initialize.new.frames,.initialize.grid.config,.initialize.grid.rows,.grid.matrix,.combine.rows,anova_menu)
+export(.add.frame,.initialize.new.frames,.initialize.grid.config,.initialize.grid.rows,.grid.matrix,.combine.rows,anova_WINDOW)
 import(stats,Rcmdr,REST)
