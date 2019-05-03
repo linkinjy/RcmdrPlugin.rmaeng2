@@ -71,5 +71,3 @@
 
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
-\keyword{ design }
-\keyword{ array }% __ONLY ONE__ keyword per line
