@@ -68,8 +68,8 @@
   New York: Wiley.
 }
 \author{ IMERMAENG2 \email{sf01363@naver.com }
-\seealso{ \code{\link{Rcmdr}
-    and \cod{\link{REST}
+\seealso{
+  \code{\link{Rcmdr}}
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
