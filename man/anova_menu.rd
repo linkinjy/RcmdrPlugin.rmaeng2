@@ -67,10 +67,8 @@
   \emph{Statistics for Experimenters, 2nd edition}.
   New York: Wiley.
 }
-\author{ IMERMAENG2 \email{sf01363@naver.com }
-\seealso{
-  \code{\link{Rcmdr}}
-}
+\author{ IMERMAENG2\email{sf01363@naver.com }
+
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{ design }
