@@ -19,6 +19,7 @@
 }
 
 anova_window <- function(){
+  require(decompr)
 
   dataSets <- listDataSets()
   defaults <- list (initial.x = NULL, initial.y = NULL, initial.method = "" )

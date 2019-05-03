@@ -5,11 +5,5 @@
 #  type          menu/item                operation/parent       label                                                     command/menu             activation            install?
 
    menu        rmaeng2Menu                topMenu             " "                                                                 " "                            " "               " "
+   item         rmaeng2Menu                command           "ANOVA"                                                  anova_window                    " "                " "
    item         topMenu                       cascade             "rmaeng2"                                                 rmaeng2Menu                    " "                " "
-
-
-## rmaeng2
-
-   menu        analyzeMenu                 rmaeng2Menu           " "                                                          " "                            " "                " "
-   item         rmaeng2Menu                 cascade              "Analyze Design"                                        analyzeMenu                     " "                " "
-   item         analyzeMenu                 command            "ANOVA"                                                   "anova_window"	               " "                " "

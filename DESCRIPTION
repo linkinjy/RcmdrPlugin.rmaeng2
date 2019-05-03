@@ -9,5 +9,6 @@ Description: The package provides a platform-independent GUI for design of exper
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-Imports: REST, Rcmdr
+Imports: Rcmdr
+Depends: decompr
 RoxygenNote: 6.1.1
