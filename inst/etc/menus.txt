@@ -12,4 +12,4 @@
 
    menu        analyzeMenu                 rmaeng2Menu           " "                                                          " "                            " "                " "
    item         rmaeng2Menu                 cascade              "Analyze Design"                                        analyzeMenu                     " "                " "
-   item         analyzeMenu                 command            "Anova"                                                   "anova_menu"	               "activeDataSetP()"                " "
+   item         analyzeMenu                 command            "ANOVA"                                                   "anova_window"	               " "                " "
