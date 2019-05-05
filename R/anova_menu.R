@@ -20,8 +20,8 @@
 
 anova_window <- function () {
   defaults <- list(initial.group = NULL, initial.response = NULL)
-  dialog.values <- getDialog("multiWayAnova", defaults)
-  initializeDialog(title = gettextRcmdr("Multi-Way Analysis of Variance"))
+  dialog.values <- getDialog("anova_window", defaults)
+  initializeDialog(title = gettextRcmdr("Anova1"))
   UpdateModelNumber()
   modelName <- tclVar(paste("AnovaModel.", getRcmdr("modelNumber"),
                             sep = ""))
@@ -51,7 +51,7 @@ anova_window <- function () {
     }
     groups <- getSelection(groupBox)
     response <- getSelection(responseBox)
-    putDialog ("multiWayAnova", list (initial.group = groups, initial.response = response))
+    putDialog ("anova_window", list (initial.group = groups, initial.response = response))
     closeDialog()
     if (length(groups) == 0) {
       errorCondition(recall = multiWayAnova, message = gettextRcmdr("You must select at least one factor."))
@@ -81,7 +81,7 @@ anova_window <- function () {
     putRcmdr("modelWithSubset", FALSE)
     tkfocus(CommanderWindow())
   }
-  OKCancelHelp(helpSubject = "Anova", model = TRUE, reset = "multiWayAnova", apply = "multiWayAnova")
+  OKCancelHelp(helpSubject = "Anova", model = TRUE, reset = "anova_window", apply = "anova_window")
   tkgrid(labelRcmdr(modelFrame, text = gettextRcmdr("Enter name for model: ")),
          model, sticky = "w")
   tkgrid(modelFrame, sticky = "w")
