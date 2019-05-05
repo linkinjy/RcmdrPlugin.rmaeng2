@@ -5,6 +5,6 @@
 #  type          menu/item                operation/parent       label                                                     command/menu             activation            install?
 
    menu        rmaeng2Menu                topMenu             " "                                                                 " "                            " "               " "
-   item         rmaeng2Menu                command           "ANOVA"                                                  anova_window                    " "                " "
+   item         rmaeng2Menu                command           "ANOVA"                                                  gvc_decomp                    " "                "packageAvailable('decompr')"
    item         topMenu                       cascade             "rmaeng2"                                                 rmaeng2Menu                    " "                " "
   

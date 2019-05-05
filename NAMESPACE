@@ -1,4 +1,5 @@
 exportPattern("^[^\\.]")
 
-export(anova_window)
+export(gvc_decomp)
 import(Rcmdr)
+import(decompr)
