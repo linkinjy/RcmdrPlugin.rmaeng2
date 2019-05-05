@@ -7,3 +7,4 @@
    menu        rmaeng2Menu                topMenu             " "                                                                 " "                            " "               " "
    item         rmaeng2Menu                command           "ANOVA"                                                  anova_window                    " "                " "
    item         topMenu                       cascade             "rmaeng2"                                                 rmaeng2Menu                    " "                " "
+  

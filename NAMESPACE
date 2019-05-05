@@ -2,4 +2,3 @@ exportPattern("^[^\\.]")
 
 export(anova_window)
 import(Rcmdr)
-import(decompr)

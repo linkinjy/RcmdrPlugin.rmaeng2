@@ -18,54 +18,75 @@
   }
 }
 
-anova_window <- function(){
-  require(decompr)
-
-  dataSets <- listDataSets()
-  defaults <- list (initial.x = NULL, initial.y = NULL, initial.method = "" )
-  dialog.values <- getDialog ("anova_window", defaults)
-  initializeDialog(title = gettextRcmdr("ANOVA"))
-  xBox <- variableListBox(top, dataSets, title = gettextRcmdr("Independent Variables") )
-  yBox <- variableListBox(top, dataSets, title = gettextRcmdr("Dependent Variables") )
-
+anova_window <- function () {
+  defaults <- list(initial.group = NULL, initial.response = NULL)
+  dialog.values <- getDialog("multiWayAnova", defaults)
+  initializeDialog(title = gettextRcmdr("Multi-Way Analysis of Variance"))
+  UpdateModelNumber()
+  modelName <- tclVar(paste("AnovaModel.", getRcmdr("modelNumber"),
+                            sep = ""))
+  modelFrame <- tkframe(top)
+  model <- ttkentry(modelFrame, width = "20", textvariable = modelName)
+  dataFrame <- tkframe(top)
+  groupBox <- variableListBox(dataFrame, Factors(), selectmode = "multiple",
+                              title = gettextRcmdr("Factors (pick one or more)"),
+                              initialSelection = varPosn(dialog.values$initial.group, "factor"))
+  responseBox <- variableListBox(dataFrame, Numeric(), title = gettextRcmdr("Response Variable (pick one)"),
+                                 initialSelection = varPosn(dialog.values$initial.response, "numeric"))
   onOK <- function() {
-    x <- getSelection(xBox)
-    y <- getSelection(yBox)
-
-    if (length(x) == 0) {
-      errorCondition(recall = anova_window, message = gettextRcmdr("You must select a variable for x."))
+    modelValue <- trim.blanks(tclvalue(modelName))
+    if (!is.valid.name(modelValue)) {
+      UpdateModelNumber(-1)
+      errorCondition(recall = multiWayAnova, message = sprintf(gettextRcmdr("\"%s\" is not a valid name."),
+                                                               modelValue))
       return()
     }
-    if (length(y) == 0) {
-      errorCondition(recall = anova_window, message = gettextRcmdr("You must select a variable for y."))
-      return()
+    if (is.element(modelValue, listAOVModels())) {
+      if ("no" == tclvalue(checkReplace(modelValue, type = gettextRcmdr("Model")))) {
+        UpdateModelNumber(-1)
+        tkdestroy(top)
+        multiWayAnova()
+        return()
+      }
     }
-
-    x <- as.matrix(x)
-    y <- as.matrix(y)
-
-    method <- as.character(tclvalue(methodVariable))
-    putDialog ("anova_window", list (initial.x = x, initial.method = method) )
+    groups <- getSelection(groupBox)
+    response <- getSelection(responseBox)
+    putDialog ("multiWayAnova", list (initial.group = groups, initial.response = response))
     closeDialog()
-    doItAndPrint(paste("ANOVA_output <- decomp(x = ", x, ", y = ", y, ", method='", method, "')", sep = ""))
-    tkdestroy(top)
+    if (length(groups) == 0) {
+      errorCondition(recall = multiWayAnova, message = gettextRcmdr("You must select at least one factor."))
+      return()
+    }
+    if (length(response) == 0) {
+      errorCondition(recall = multiWayAnova, message = gettextRcmdr("You must select a response variable."))
+      return()
+    }
+    .activeDataSet <- ActiveDataSet()
+    groups.list <- paste(paste(groups, sep = ""), collapse = ", ")
+    doItAndPrint(paste(modelValue, " <- lm(", response,
+                       " ~ ", paste(groups, collapse = "*"), ", data=",
+                       .activeDataSet, ", contrasts=list(", paste(paste(groups, '="contr.Sum"'), collapse=", "), "))", sep = ""))
+    doItAndPrint(paste("Anova(", modelValue, ")", sep = ""))
+    doItAndPrint(paste("with(", .activeDataSet, ", (tapply(", response,
+                       ", list(", groups.list, "), mean, na.rm=TRUE))) # means",
+                       sep = ""))
+    doItAndPrint(paste("with(", .activeDataSet, ", (tapply(", response,
+                       ", list(", groups.list, "), sd, na.rm=TRUE))) # std. deviations",
+                       sep = ""))
+    # doItAndPrint(paste("with(", .activeDataSet, ", (tapply(", response,
+    #                    ", list(", groups.list, "), function(x) sum(!is.na(x))))) # counts",
+    #                    sep = ""))
+    doItAndPrint(paste("xtabs(~ ", paste(groups, collapse=" + "), ", data=", .activeDataSet, ") # counts", sep=""))
+    activeModel(modelValue)
+    putRcmdr("modelWithSubset", FALSE)
     tkfocus(CommanderWindow())
   }
-  OKCancelHelp(helpSubject = "ANOVA", reset = "anova_window")
-  optionsFrame <- tkframe(top)
-  checkBoxes(optionsFrame, frame = "methodFrame", boxes = c("tukey",
-                                                          "fisher", "bonferroni", "scheffe", "duncan", "newmankeuls", "CI", "maineffect", "interaction"),
-               labels = gettextRcmdr(c("Tukey's HSD", "Fisher's LSD",
-                                       "Bonferroni", "Scheffe", "Duncan", "Newmankeuls", "Confidence Level", "Main Effect", "Interaction")), title = gettextRcmdr("Option"),
-               initialValue = NULL)
-  rightFrame <- tkframe(optionsFrame)
-  tkgrid(getFrame(xBox), sticky = "nw")
-  tkgrid(getFrame(yBox), sticky = "nw")
-  tkgrid(labelRcmdr(rightFrame, text = ""), sticky = "w")
-  tkgrid(methodFrame, rightFrame, sticky = "nw")
-  tkgrid(optionsFrame, sticky="w")
-  tkgrid(buttonsFrame, columnspan = 2, sticky = "w")
+  OKCancelHelp(helpSubject = "Anova", model = TRUE, reset = "multiWayAnova", apply = "multiWayAnova")
+  tkgrid(labelRcmdr(modelFrame, text = gettextRcmdr("Enter name for model: ")),
+         model, sticky = "w")
+  tkgrid(modelFrame, sticky = "w")
+  tkgrid(getFrame(groupBox), labelRcmdr(dataFrame, text="  "), getFrame(responseBox), sticky = "nw")
+  tkgrid(dataFrame, sticky="w")
+  tkgrid(buttonsFrame, sticky = "w")
   dialogSuffix()
-
-
 }
