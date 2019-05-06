@@ -13,10 +13,6 @@
   This vignette is located in the \code{doc} folder of the package together with all the R scripts which are described in the vignette.
 }
 \author{IMERMAENG2 \email{sf01363@naver.com}}
-\seealso{
-  \code{\link{Rcmdr}}
-}
-
 \keyword{package}
 \seealso{
 \code{\link[Rcmdr]{Rcmdr}}.
