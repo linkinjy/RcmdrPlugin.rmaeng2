@@ -10,5 +10,5 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports: Rcmdr
-Depends: rgl, TeachingDemos (>=2.9), tkrplot
+Depends: rgl, TeachingDemos, tkrplot
 RoxygenNote: 6.1.1
