@@ -1,29 +1,62 @@
-.onAttach <- function(libname, pkgname){
-  if (!interactive()) return()
-  putRcmdr("slider.env", new.env())
-  Rcmdr <- options()$Rcmdr
-  plugins <- Rcmdr$plugins
-  if (!pkgname %in% plugins) {
-    Rcmdr$plugins <- c(plugins, pkgname)
-    options(Rcmdr=Rcmdr)
-    if("package:Rcmdr" %in% search()) {
-      if(!getRcmdr("autoRestart")) {
-        closeCommander(ask=FALSE, ask.save=TRUE)
-        Commander()
-      }
-    }
-    else {
-      Commander()
-    }
+.onAttach <- function(libname, pkgname) {
+  if (!interactive()) {
+    return()
   }
-}
+
+  # Current options
+  Rcmdr_opts <- options()$Rcmdr
+
+  # If empty, convert to named list
+  if (is.null(Rcmdr_opts)) {
+    Rcmdr_opts <- list(plugins = NULL)
+  }
+
+  # TODO: getRcmdr("messages.height")  <----------- [???]
+
+  # Plugins to add
+  add_plugins <- "RcmdrPlugin.rmaeng2"
+
+  # Add plugins in certain order
+  plugins <- c(
+    setdiff(Rcmdr_opts$plugins, add_plugins),
+    rev(sort(add_plugins))
+  )
+
+  # Open 3-window Rcmdr, if options is not defined
+  if (is.null(Rcmdr_opts$console.output)) {
+    console.output <- FALSE
+
+  } else {
+    console.output <- Rcmdr_opts$console.output
+  }
+
+  updated_opts <-
+    utils::modifyList(
+      Rcmdr_opts,
+      list(plugins = plugins, console.output = console.output)
+    )
+
+  if (!identical(Rcmdr_opts, updated_opts)) {
+    # Set new options and restart R Commander
+    options(Rcmdr = updated_opts)
+
+    # if (!"package:Rcmdr" %in% search()) {
+    #     Rcmdr::Commander()
+    #
+    # } else {
+    #     if (!isTRUE(Rcmdr::getRcmdr("autoRestart", fail = FALSE))) {
+    #         Rcmdr::closeCommander(ask = FALSE, ask.save = TRUE)
+    #         Rcmdr::Commander()
+    #     }
+    # }
+  }}
 
 gvc_decomp <- function(){
   require(decompr)
-  
+
   dataSets <- listDataSets()
   defaults <- list (initial.x = NULL, initial.y = NULL, initial.method = "leontief" )
-  dialog.values <- getDialog ("gvc_decomp", defaults)  
+  dialog.values <- getDialog ("gvc_decomp", defaults)
   initializeDialog(title = gettextRcmdr("GVC Decomposition"))
   xBox <- variableListBox(top, dataSets, title = gettextRcmdr("Intermediate Demand") )
   yBox <- variableListBox(top, dataSets, title = gettextRcmdr("Final Demand") )
@@ -70,9 +103,9 @@ gvc_decomp <- function(){
   }
   OKCancelHelp(helpSubject = "decomp", reset = "gvc_decomp")
   optionsFrame <- tkframe(top)
-  radioButtons(optionsFrame, name = "method", buttons = c("leontief", 
-                                                          "wwz", "vertical_specialisation"), values = c("leontief", "wwz", "vertical_specialisation"), 
-               labels = gettextRcmdr(c("Leontief", "Wang-Wei-Zhu", 
+  radioButtons(optionsFrame, name = "method", buttons = c("leontief",
+                                                          "wwz", "vertical_specialisation"), values = c("leontief", "wwz", "vertical_specialisation"),
+               labels = gettextRcmdr(c("Leontief", "Wang-Wei-Zhu",
                                        "Vertical Specialisation")), title = gettextRcmdr("Decomposition method"),
                initialValue = dialog.values$initial.method)
   rightFrame <- tkframe(optionsFrame)
@@ -86,6 +119,6 @@ gvc_decomp <- function(){
   tkgrid(optionsFrame, sticky="w")
   tkgrid(buttonsFrame, columnspan = 2, sticky = "w")
   dialogSuffix()
-  
-  
+
+
 }
