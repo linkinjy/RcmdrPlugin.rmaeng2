@@ -13,6 +13,7 @@
 \alias{visGamma}
 \alias{visNormal}
 \alias{vist}
+\alias{mmultiWayAnova}
 \description{Internal Rcmdrrmaeng2Plugin objects.}
 \details{These are not to be called by the user.}
 \keyword{internal}
