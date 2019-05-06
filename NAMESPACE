@@ -1,5 +1,5 @@
 exportPattern("^[^\\.]")
 
-import(stats, Rcmdr, TeachingDemos, rgl, tkrplot, FrF2.catlg128)
+import(stats, Rcmdr, TeachingDemos, rgl, tkrplot)
 importFrom("tcltk", "tkbutton")
 importFrom("graphics", "plot", "title")
