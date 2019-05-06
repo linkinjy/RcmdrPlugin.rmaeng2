@@ -1,5 +1,5 @@
 exportPattern("^[^\\.]")
 
-export(gvc_decomp)
-import(Rcmdr)
-import(decompr)
+import(stats, Rcmdr, TeachingDemos, rgl, tkrplot)
+importFrom("tcltk", "tkbutton")
+importFrom("graphics", "plot", "title")

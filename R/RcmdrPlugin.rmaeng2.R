@@ -1,124 +1,262 @@
-.onAttach <- function(libname, pkgname) {
-  if (!interactive()) {
-    return()
-  }
-
-  # Current options
-  Rcmdr_opts <- options()$Rcmdr
-
-  # If empty, convert to named list
-  if (is.null(Rcmdr_opts)) {
-    Rcmdr_opts <- list(plugins = NULL)
-  }
-
-  # TODO: getRcmdr("messages.height")  <----------- [???]
-
-  # Plugins to add
-  add_plugins <- "RcmdrPlugin.rmaeng2"
-
-  # Add plugins in certain order
-  plugins <- c(
-    setdiff(Rcmdr_opts$plugins, add_plugins),
-    rev(sort(add_plugins))
-  )
-
-  # Open 3-window Rcmdr, if options is not defined
-  if (is.null(Rcmdr_opts$console.output)) {
-    console.output <- FALSE
-
-  } else {
-    console.output <- Rcmdr_opts$console.output
-  }
-
-  updated_opts <-
-    utils::modifyList(
-      Rcmdr_opts,
-      list(plugins = plugins, console.output = console.output)
-    )
-
-  if (!identical(Rcmdr_opts, updated_opts)) {
-    # Set new options and restart R Commander
-    options(Rcmdr = updated_opts)
-
-    # if (!"package:Rcmdr" %in% search()) {
-    #     Rcmdr::Commander()
-    #
-    # } else {
-    #     if (!isTRUE(Rcmdr::getRcmdr("autoRestart", fail = FALSE))) {
-    #         Rcmdr::closeCommander(ask = FALSE, ask.save = TRUE)
-    #         Rcmdr::Commander()
-    #     }
-    # }
-  }}
-
-gvc_decomp <- function(){
-  require(decompr)
-
-  dataSets <- listDataSets()
-  defaults <- list (initial.x = NULL, initial.y = NULL, initial.method = "leontief" )
-  dialog.values <- getDialog ("gvc_decomp", defaults)
-  initializeDialog(title = gettextRcmdr("GVC Decomposition"))
-  xBox <- variableListBox(top, dataSets, title = gettextRcmdr("Intermediate Demand") )
-  yBox <- variableListBox(top, dataSets, title = gettextRcmdr("Final Demand") )
-  kBox <- variableListBox(top, dataSets, title = gettextRcmdr("Countries / Regions") )
-  iBox <- variableListBox(top, dataSets, title = gettextRcmdr("Industries") )
-  oBox <- variableListBox(top, dataSets, title = gettextRcmdr("Final Output") )
-  onOK <- function() {
-    x <- getSelection(xBox)
-    y <- getSelection(yBox)
-    k <- getSelection(kBox)
-    i <- getSelection(iBox)
-    o <- getSelection(oBox)
-    if (length(x) == 0) {
-      errorCondition(recall = gvc_decomp, message = gettextRcmdr("You must select a variable for x."))
-      return()
-    }
-    if (length(y) == 0) {
-      errorCondition(recall = gvc_decomp, message = gettextRcmdr("You must select a variable for y."))
-      return()
-    }
-    if (length(k) == 0) {
-      errorCondition(recall = gvc_decomp, message = gettextRcmdr("You must select a variable for k."))
-      return()
-    }
-    if (length(i) == 0) {
-      errorCondition(recall = gvc_decomp, message = gettextRcmdr("You must select a variable for i."))
-      return()
-    }
-    if (length(o) == 0) {
-      errorCondition(recall = gvc_decomp, message = gettextRcmdr("You must select a variable for o."))
-      return()
-    }
-    x <- as.matrix(x)
-    y <- as.matrix(y)
-    k <- as.vector(unlist(lapply(k, as.character)))
-    i <- as.vector(unlist(lapply(i, as.character)))
-    o <- as.vector(unlist(o))
-    method <- as.character(tclvalue(methodVariable))
-    putDialog ("gvc_decomp", list (initial.x = x, initial.method = method) )
+simulateConfidenceIntervals <- function(){
+  defaults <- list(muVar="100", sigmaVar="15", nVar="25", repsVar="50", confLevelVar=".95", sigmaKnownVar="1")
+  dialog.values <- getDialog("simulateConfidenceIntervals", defaults)
+  initializeDialog(title=gettextRcmdr("Confidence Intervals for the Mean"))
+  muVar <- tclVar(dialog.values$muVar)
+  muEntry <- tkentry(top, width="6", textvariable=muVar)
+  sigmaVar <- tclVar(dialog.values$sigmaVar)
+  sigmaEntry <- tkentry(top, width="6", textvariable=sigmaVar)
+  nVar <- tclVar(dialog.values$nVar)
+  nEntry <- tkentry(top, width="6", textvariable=nVar)
+  repsVar <- tclVar(dialog.values$repsVar)
+  repsEntry <- tkentry(top, width="6", textvariable=repsVar)
+  confLevelVar <- tclVar(dialog.values$confLevelVar)
+  confLevelEntry <- tkentry(top, width="6", textvariable=confLevelVar)
+  sigmaKnownVar <- tclVar(dialog.values$sigmaKnownVar)
+  sigmaKnownBox <- tkcheckbutton(top, variable=sigmaKnownVar)
+  onOK <- function(){
     closeDialog()
-    doItAndPrint(paste("decomposition_output <- decomp(x = ", x, ", y = ", y, ", k = ", k, ", i = ", i, ", o = ", o, ", method='", method, "')", sep = ""))
-    tkdestroy(top)
+    mu <- as.numeric(tclvalue(muVar))
+    if (is.na(mu)){
+      errorCondition(recall=simulateConfidenceIntervals, message="Population mean must be a number.")
+      return()
+    }
+    sigma <- as.numeric(tclvalue(sigmaVar))
+    if (is.na(sigma) || sigma <= 0){
+      errorCondition(recall=simulateConfidenceIntervals,
+                     message="Population standard deviation must be a positive number.")
+      return()
+    }
+    n <- round(as.numeric(tclvalue(nVar)))
+    if (is.na(n) || n <= 0){
+      errorCondition(recall=simulateConfidenceIntervals, message="Sample size must be a positive integer.")
+      return()
+    }
+    reps <- round(as.numeric(tclvalue(repsVar)))
+    if (is.na(reps) || reps <= 0){
+      errorCondition(recall=simulateConfidenceIntervals, message="Number of samples must be a positive integer.")
+      return()
+    }
+    confLevel <- as.numeric(tclvalue(confLevelVar))
+    if (is.na(confLevel) || confLevel <= 0 || confLevel >= 1){
+      errorCondition(recall=simulateConfidenceIntervals, message="Confidence level must be between 0 and 1.")
+      return()
+    }
+    sigmaKnown <- as.numeric(tclvalue(sigmaKnownVar))
+    putDialog("simulateConfidenceIntervals", lapply(list(muVar=mu, sigmaVar=sigma, nVar=n, repsVar=reps,
+                                                         confLevelVar=confLevel, sigmaKnownVar=sigmaKnown), as.character))
+    command <- paste("ci.examp(mean.sim = ", mu, ", sd = ", sigma, ", n = ", n, ", reps = ", reps,
+                     ", conf.level = ", confLevel, ", method = ", if (sigmaKnown) '"z"' else '"t"', ")", sep="")
+    doItAndPrint(command)
     tkfocus(CommanderWindow())
   }
-  OKCancelHelp(helpSubject = "decomp", reset = "gvc_decomp")
-  optionsFrame <- tkframe(top)
-  radioButtons(optionsFrame, name = "method", buttons = c("leontief",
-                                                          "wwz", "vertical_specialisation"), values = c("leontief", "wwz", "vertical_specialisation"),
-               labels = gettextRcmdr(c("Leontief", "Wang-Wei-Zhu",
-                                       "Vertical Specialisation")), title = gettextRcmdr("Decomposition method"),
-               initialValue = dialog.values$initial.method)
-  rightFrame <- tkframe(optionsFrame)
-  tkgrid(getFrame(xBox), sticky = "nw")
-  tkgrid(getFrame(yBox), sticky = "nw")
-  tkgrid(getFrame(kBox), sticky = "nw")
-  tkgrid(getFrame(iBox), sticky = "nw")
-  tkgrid(getFrame(oBox), sticky = "nw")
-  tkgrid(labelRcmdr(rightFrame, text = ""), sticky = "w")
-  tkgrid(methodFrame, rightFrame, sticky = "nw")
-  tkgrid(optionsFrame, sticky="w")
-  tkgrid(buttonsFrame, columnspan = 2, sticky = "w")
-  dialogSuffix()
-
-
+  OKCancelHelp(helpSubject="ci.examp", reset="simulateConfidenceIntervals", apply="simulateConfidenceIntervals")
+  tkgrid(tklabel(top, text="Population mean"), muEntry, sticky="e")
+  tkgrid(tklabel(top, text="Population standard deviation"), sigmaEntry, sticky="e")
+  tkgrid(tklabel(top, text="Sample size"), nEntry, sticky="e")
+  tkgrid(tklabel(top, text="Number of samples"), repsEntry, sticky="e")
+  tkgrid(tklabel(top, text="Confidence level"), confLevelEntry, sticky="e")
+  tkgrid(tklabel(top, text="Population standard deviation known"), sigmaKnownBox, sticky="e")
+  tkgrid(buttonsFrame, sticky="w", columnspan=2)
+  tkgrid.configure(muEntry, sticky="w")
+  tkgrid.configure(sigmaEntry, sticky="w")
+  tkgrid.configure(nEntry, sticky="w")
+  tkgrid.configure(repsEntry, sticky="w")
+  tkgrid.configure(confLevelEntry, sticky="w")
+  tkgrid.configure(sigmaKnownBox, sticky="w")
+  dialogSuffix(rows=7, columns=2, focus=muEntry)
 }
+
+centralLimitTheorem <- function(){
+  Library("TeachingDemos")
+  initializeDialog(title=gettextRcmdr("Central Limit Theorem"))
+  defaults <- list(nVar="1", repsVar=10000, nclassVar="16")
+  dialog.values <- getDialog("centralLimitTheorem", defaults)
+  nVar <- tclVar(dialog.values$nVar)
+  nEntry <- tkentry(top, width="6", textvariable=nVar)
+  repsVar <- tclVar(dialog.values$repsVar)
+  repsEntry <- tkentry(top, width="6", textvariable=repsVar)
+  nclassVar <- tclVar(dialog.values$nclassVar)
+  nclassEntry <- tkentry(top, width="6", textvariable=nclassVar)
+  onOK <- function(){
+    closeDialog()
+    n <- round(as.numeric(tclvalue(nVar)))
+    if (is.na(n) || n <= 0){
+      errorCondition(recall=simulateConfidenceIntervals, message="Sample size must be a positive integer.")
+      return()
+    }
+    reps <- round(as.numeric(tclvalue(repsVar)))
+    if (is.na(reps) || reps <= 0){
+      errorCondition(recall=simulateConfidenceIntervals, message="Number of samples must be a positive integer.")
+      return()
+    }
+    nclass <- round(as.numeric(tclvalue(nclassVar)))
+    if (is.na(nclass) || reps <= 0){
+      errorCondition(recall=simulateConfidenceIntervals, message="Number of samples must be a positive integer.")
+      return()
+    }
+    putDialog("centralLimitTheorem", lapply(list(nVar=n, repsVar=reps, nclassVar=nclass), as.character))
+    command <- paste("clt.examp(n = ", n, ", reps = ", reps, ", nclass =", nclass, ")", sep="")
+    doItAndPrint(command)
+    tkfocus(CommanderWindow())
+  }
+  OKCancelHelp(helpSubject="clt.examp", reset="centralLimitTheorem", apply="centralLimitTheorem")
+  tkgrid(tklabel(top, text="Sample size"), nEntry, sticky="e")
+  tkgrid(tklabel(top, text="Number of samples"), repsEntry, sticky="e")
+  tkgrid(tklabel(top, text="Approximate number of bins for histograms"), nclassEntry, sticky="e")
+  tkgrid(buttonsFrame, sticky="w", columnspan=2)
+  tkgrid.configure(nEntry, sticky="w")
+  tkgrid.configure(repsEntry, sticky="w")
+  tkgrid.configure(nclassEntry, sticky="w")
+  dialogSuffix(rows=4, columns=2, focus=nEntry)
+}
+
+flipCoin <- function(){
+  rgl::rgl.open()
+  TeachingDemos::rgl.coin()
+  TeachingDemos::flip.rgl.coin()
+}
+
+rollDie <- function(){
+  rgl::rgl.open()
+  TeachingDemos::rgl.die()
+  TeachingDemos::roll.rgl.die()
+}
+
+powerExample <- function(){
+  TeachingDemos::power.examp()
+  TeachingDemos::run.power.examp()
+}
+
+correlationExample <- function(){
+  TeachingDemos::run.cor.examp()
+}
+
+linearRegressionExample <- function(){
+  put.points.demo()
+}
+
+visBinom <- function(){
+  TeachingDemos::vis.binom()
+}
+
+visNormal <- function(){
+  TeachingDemos::vis.normal()
+}
+
+vist <- function(){
+  TeachingDemos::vis.t()
+}
+
+visGamma <- function(){
+  TeachingDemos::vis.gamma()
+}
+
+run.cor.examp <- function (n = 100, seed)
+  # slightly modified by J. Fox from the TeachingDemos package
+{
+  if (!missing(seed)) {
+    set.seed(seed)
+  }
+  x <- scale(matrix(rnorm(2 * n, 0, 1), ncol = 2))
+  x <- x %*% solve(chol(cor(x)))
+  xr <- range(x)
+  cor.refresh <- function(...) {
+    r <- slider(no = 1)
+    if (r == 1) {
+      cmat <- matrix(c(1, 0, 1, 0), 2)
+    }
+    else if (r == -1) {
+      cmat <- matrix(c(1, 0, -1, 0), 2)
+    }
+    else {
+      cmat <- chol(matrix(c(1, r, r, 1), 2))
+    }
+    new.x <- x %*% cmat
+    plot(new.x, xlab = "x", ylab = "y", xlim = xr, ylim = xr)
+    title(paste("r = ", round(cor(new.x[, 1], new.x[, 2]),
+                              3)))
+  }
+  slider(cor.refresh, "Correlation", -1, 1, 0.01, 0, title = "Correlation Demo")
+  cor.refresh()
+}
+
+slider <- function (sl.functions, sl.names, sl.mins, sl.maxs, sl.deltas,
+                    sl.defaults, but.functions, but.names, no, set.no.value,
+                    obj.name, obj.value, reset.function, title)
+  # slightly modified by J. Fox from the TeachingDemos package
+{
+  if (!missing(no))
+    return(as.numeric(tclvalue(get(paste("slider", no, sep = ""),
+                                   envir = getRcmdr("slider.env")))))
+  if (!missing(set.no.value)) {
+    try(eval(parse(text = paste("tclvalue(slider", set.no.value[1],
+                                ")<-", set.no.value[2], sep = "")), envir = getRcmdr("slider.env")))
+    return(set.no.value[2])
+  }
+  if (!missing(obj.name)) {
+    if (!missing(obj.value))
+      assign(obj.name, obj.value, envir = getRcmdr("slider.env"))
+    else obj.value <- get(obj.name, envir = getRcmdr("slider.env"))
+    return(obj.value)
+  }
+  if (missing(title))
+    title <- "slider control widget"
+  nt <- tktoplevel()
+  tkwm.title(nt, title)
+  tkwm.geometry(nt, "+0+0")
+  if (missing(sl.names))
+    sl.names <- NULL
+  if (missing(sl.functions))
+    sl.functions <- function(...) {
+    }
+  for (i in seq(sl.names)) {
+    eval(parse(text = paste("assign('slider", i, "',tclVar(sl.defaults[i]), envir=getRcmdr('slider.env'))",
+                            sep = "")))
+    tkpack(fr <- tkframe(nt))
+    lab <- tklabel(fr, text = sl.names[i], width = "25")
+    sc <- tkscale(fr, from = sl.mins[i], to = sl.maxs[i],
+                  showvalue = TRUE, resolution = sl.deltas[i], orient = "horiz")
+    tkpack(lab, sc, side = "right")
+    assign("sc", sc, envir = getRcmdr("slider.env"))
+    eval(parse(text = paste("tkconfigure(sc,variable=slider",
+                            i, ")", sep = "")), envir = getRcmdr("slider.env"))
+    sl.fun <- if (length(sl.functions) > 1)
+      sl.functions[[i]]
+    else sl.functions
+    if (!is.function(sl.fun))
+      sl.fun <- eval(parse(text = paste("function(...){",
+                                        sl.fun, "}")))
+    tkconfigure(sc, command = sl.fun)
+  }
+  assign("slider.values.old", sl.defaults, envir = getRcmdr("slider.env"))
+  tkpack(f.but <- tkframe(nt), fill = "x")
+  tkpack(tkbutton(f.but, text = "Exit", command = function() tkdestroy(nt)),
+         side = "right")
+  if (!missing(reset.function)){
+    reset.function <- function(...) print("relax")
+    if (!is.function(reset.function))
+      reset.function <- eval(parse(text = paste("function(...){",
+                                                reset.function, "}")))
+    tkpack(tkbutton(f.but, text = "Reset", command = function() {
+      for (i in seq(sl.names)) eval(parse(text = paste("tclvalue(slider",
+                                                       i, ")<-", sl.defaults[i], sep = "")), envir = getRcmdr("slider.env"))
+      reset.function()
+    }), side = "right")
+  }
+  if (missing(but.names))
+    but.names <- NULL
+  for (i in seq(but.names)) {
+    but.fun <- if (length(but.functions) > 1)
+      but.functions[[i]]
+    else but.functions
+    if (!is.function(but.fun))
+      but.fun <- eval(parse(text = paste("function(...){",
+                                         but.fun, "}")))
+    tkpack(tkbutton(f.but, text = but.names[i], command = but.fun),
+           side = "left")
+    cat("button", i, "eingerichtet")
+  }
+  invisible(nt)
+}
+

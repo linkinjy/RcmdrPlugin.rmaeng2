@@ -16,3 +16,8 @@
 \seealso{
   \code{\link{Rcmdr}}
 }
+
+\keyword{package}
+\seealso{
+\code{\link[Rcmdr]{Rcmdr}}.
+}
