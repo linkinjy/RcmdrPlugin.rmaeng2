@@ -468,3 +468,59 @@ latinrandomtable <- function () {
   dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
 }
 
+multirandomtable <- function () {
+  defaults <- list(initial.factornumber = "c(2,3)", initial.repetition = "", initial.seed="0", initial.std="FALSE")
+  dialog.values <- getDialog("multirandomtable", defaults)
+  initializeDialog(title = gettextRcmdr("Random Number Table of Multi Way"), use.tabs = FALSE)
+  mainFrame <- tkframe(top)
+
+  onOK <- function() {
+
+    fac<-as.character(tclvalue(factornumber))
+    repet<-tclvalue(repetition)
+    sed<-tclvalue(seed)
+    sttd<-as.character(tclvalue(std))
+
+    putDialog ("onerandomtable", list (initial.factornumber = fac, initial.repetition = repet, initial.seed = sed, initial.std = sttd))
+    closeDialog()
+
+    doItAndPrint(paste("random.multi(", "fac=", fac,",", "r=", repet,",", "seed=", sed,",", "std=", sttd, ")", sep = ""))
+    tkfocus(CommanderWindow())
+  }
+
+  OKCancelHelp(helpSubject = "Anova", model = TRUE, reset = "multiWayAnova", apply = "multiWayAnova")
+
+  factorFrame <- tkframe(mainFrame)
+  factornumber <- tclVar(dialog.values$initial.factornumber)
+  factorField <- ttkentry(factorFrame, width = "12", textvariable = factornumber)
+
+  repetFrame <- tkframe(mainFrame)
+  repetition <- tclVar(dialog.values$initial.repetition)
+  repetField <- ttkentry(repetFrame, width = "12", textvariable = repetition)
+
+  seedFrame <- tkframe(mainFrame)
+  seed <- tclVar(dialog.values$initial.seed)
+  seedField <- ttkentry(seedFrame, width = "12", textvariable = seed)
+
+  stdFrame <- tkframe(mainFrame)
+  std <- tclVar(dialog.values$initial.std)
+  stdField <- ttkentry(stdFrame, width = "12", textvariable = std)
+
+  tkgrid(labelRcmdr(mainFrame, text="  "), sticky = "nw")
+  tkgrid(mainFrame, sticky="nw")
+  tkgrid(labelRcmdr(factorFrame, text = gettextRcmdr("Factor/input Each factor's Level"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(repetFrame, text = gettextRcmdr("Repet"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(seedFrame, text = gettextRcmdr("Seed"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(stdFrame, text = gettextRcmdr("Std/TRUE or FALSE"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(factorField, sticky="w")
+  tkgrid(repetField, sticky="w")
+  tkgrid(seedField, sticky="w")
+  tkgrid(stdField, sticky="w")
+  tkgrid(factorFrame, labelRcmdr(mainFrame, text = " "), sticky = "nw")
+  tkgrid(repetFrame, labelRcmdr(mainFrame, text = " "), sticky = "nw")
+  tkgrid(seedFrame, labelRcmdr(mainFrame, text = " "), sticky = "nw")
+  tkgrid(stdFrame, labelRcmdr(mainFrame, text = " "), sticky = "nw")
+  tkgrid(buttonsFrame, sticky = "w")
+  dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
+}
+
