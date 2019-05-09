@@ -411,3 +411,60 @@ onerandomtable <- function () {
   tkgrid(buttonsFrame, sticky = "w")
   dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
 }
+
+latinrandomtable <- function () {
+  defaults <- list(initial.factornumber = "3", initial.greco = "FALSE", initial.seed="0", initial.std="FALSE")
+  dialog.values <- getDialog("latinrandomtable", defaults)
+  initializeDialog(title = gettextRcmdr("Random Number Table of Latin Square"), use.tabs = FALSE)
+  mainFrame <- tkframe(top)
+
+  onOK <- function() {
+
+    n<-tclvalue(factornumber)
+    greco<-as.character(tclvalue(greco))
+    sed<-tclvalue(seed)
+    sttd<-as.character(tclvalue(std))
+
+    putDialog ("grecorandomtable", list (initial.factornumber = n, initial.greco = greco, initial.seed = sed, initial.std = sttd))
+    closeDialog()
+
+    doItAndPrint(paste("random.latin(", "n=", n,",", "greco=", greco,",", "seed=", sed,",", "std=", sttd, ")", sep = ""))
+    tkfocus(CommanderWindow())
+  }
+
+  OKCancelHelp(helpSubject = "Anova", model = TRUE, reset = "multiWayAnova", apply = "multiWayAnova")
+
+  factorFrame <- tkframe(mainFrame)
+  factornumber <- tclVar(dialog.values$initial.factornumber)
+  factorField <- ttkentry(factorFrame, width = "12", textvariable = factornumber)
+
+  grecoFrame <- tkframe(mainFrame)
+  greco <- tclVar(dialog.values$initial.greco)
+  grecoField <- ttkentry(grecoFrame, width = "12", textvariable = greco)
+
+  seedFrame <- tkframe(mainFrame)
+  seed <- tclVar(dialog.values$initial.seed)
+  seedField <- ttkentry(seedFrame, width = "12", textvariable = seed)
+
+  stdFrame <- tkframe(mainFrame)
+  std <- tclVar(dialog.values$initial.std)
+  stdField <- ttkentry(stdFrame, width = "12", textvariable = std)
+
+  tkgrid(labelRcmdr(mainFrame, text="  "), sticky = "nw")
+  tkgrid(mainFrame, sticky="nw")
+  tkgrid(labelRcmdr(factorFrame, text = gettextRcmdr("Number of Factor / N*N latin square"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(grecoFrame, text = gettextRcmdr("Latin or Greco / TRUE = Greco, FALSE = Latin"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(seedFrame, text = gettextRcmdr("Seed"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(stdFrame, text = gettextRcmdr("Std/TRUE or FALSE"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(factorField, sticky="w")
+  tkgrid(grecoField, sticky="w")
+  tkgrid(seedField, sticky="w")
+  tkgrid(stdField, sticky="w")
+  tkgrid(factorFrame, labelRcmdr(mainFrame, text = " "), sticky = "nw")
+  tkgrid(grecoFrame, labelRcmdr(mainFrame, text = " "), sticky = "nw")
+  tkgrid(seedFrame, labelRcmdr(mainFrame, text = " "), sticky = "nw")
+  tkgrid(stdFrame, labelRcmdr(mainFrame, text = " "), sticky = "nw")
+  tkgrid(buttonsFrame, sticky = "w")
+  dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
+}
+
