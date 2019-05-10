@@ -524,3 +524,80 @@ multirandomtable <- function () {
   dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
 }
 
+mainplot <- function () {
+  defaults <- list(initial.group = NULL,initial.response = NULL)
+  dialog.values <- getDialog("mainplot", defaults)
+  initializeDialog(title = gettextRcmdr("Main Effects Plot"), use.tabs = FALSE)
+  dataFrame <- tkframe(top)
+  groupBox <- variableListBox(dataFrame, Factors(), selectmode = "single",
+                              title = gettextRcmdr("Factors (pick one)"),
+                              initialSelection = varPosn(dialog.values$initial.group, "factor"))
+  responseBox <- variableListBox(dataFrame, Numeric(), title = gettextRcmdr("Response Variable (pick one)"),
+                                 initialSelection = varPosn(dialog.values$initial.response, "numeric"))
+
+  onOK <- function() {
+    groups <- getSelection(groupBox)
+    response <- getSelection(responseBox)
+    if (length(groups) == 0) {
+      errorCondition(recall = mainplot, message = gettextRcmdr("You must select at least one factor."))
+      return()}
+    putDialog ("mainplot", list (initial.group = groups, initial.response = response))
+    closeDialog()
+
+    .activeDataSet <- ActiveDataSet()
+    groups.list <- paste(paste(groups, sep = ""), collapse = ", ")
+    doItAndPrint(paste("main.effect(", .activeDataSet,',',groups,',',response, ")"))
+    tkfocus(CommanderWindow())
+  }
+
+  OKCancelHelp(helpSubject = "Anova", model = TRUE, reset = "mainplot", apply = "mainplot")
+
+  tkgrid(getFrame(groupBox), labelRcmdr(dataFrame, text="  "), sticky = "nw")
+  tkgrid(getFrame(responseBox), labelRcmdr(dataFrame, text=" "), sticky = "nw")
+  tkgrid(dataFrame, sticky="nw")
+  tkgrid(buttonsFrame, sticky = "w")
+  dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
+}
+
+interactionplot <- function () {
+  defaults <- list(initial.group = NULL,initial.response = NULL)
+  dialog.values <- getDialog("interactionplot", defaults)
+  initializeDialog(title = gettextRcmdr("Interaction Plot"), use.tabs = FALSE)
+  dataFrame <- tkframe(top)
+  groupBox <- variableListBox(dataFrame, Factors(), selectmode = "multiple",
+                              title = gettextRcmdr("Factors (pick two)"),
+                              initialSelection = varPosn(dialog.values$initial.group, "factor"))
+  responseBox <- variableListBox(dataFrame, Numeric(), title = gettextRcmdr("Response Variable (pick one)"),
+                                 initialSelection = varPosn(dialog.values$initial.response, "numeric"))
+
+  onOK <- function() {
+    groups <- getSelection(groupBox)
+    response <- getSelection(responseBox)
+    if (length(groups) == 0) {
+      errorCondition(recall = mainplot, message = gettextRcmdr("You must select two factor."))
+      return()}
+    if (length(groups) == 1) {
+      errorCondition(recall = mainplot, message = gettextRcmdr("You must select two factor."))
+      return()}
+    if (length(response) == 0) {
+      errorCondition(recall = mainplot, message = gettextRcmdr("You must select at least one factor."))
+      return()}
+    putDialog ("interactionplot", list (initial.group = groups, initial.response = response))
+    closeDialog()
+
+    .activeDataSet <- ActiveDataSet()
+    groups.list <- paste(paste(groups, sep = ""), collapse = ", ")
+    doItAndPrint(paste("interaction.effect(", .activeDataSet,',',groups.list,',',response, ")"))
+    tkfocus(CommanderWindow())
+  }
+
+  OKCancelHelp(helpSubject = "Anova", model = TRUE, reset = "interactionplot", apply = "interactionplot")
+
+  tkgrid(getFrame(groupBox), labelRcmdr(dataFrame, text="  "), sticky = "nw")
+  tkgrid(getFrame(responseBox), labelRcmdr(dataFrame, text=" "), sticky = "nw")
+  tkgrid(dataFrame, sticky="nw")
+  tkgrid(buttonsFrame, sticky = "w")
+  dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
+}
+
+

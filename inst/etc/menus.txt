@@ -15,4 +15,7 @@ item    rmaeng2Menu       command         "Multiway anova"                    mm
 item    rmaeng2Menu       command         "Random number table of oneway"                    onerandomtable          ""                      ""
 item    rmaeng2Menu       command         "Random number table of latin and greco"                    latinrandomtable          ""                      ""
 item    rmaeng2Menu       command         "Random number table of multiway"                    multirandomtable          ""                      ""
+item    rmaeng2Menu       command         "Main effect plot"                    mainplot          ""                      ""
+item    rmaeng2Menu       command         "Interaction plot"                    interactionplot          ""                      ""
+item    rmaeng2Menu       command         "Scatter plot"                    scatterplot          ""                      ""
 item    topMenu         cascade         "rmaeng2"                                 rmaeng2Menu                   ""                      "packageAvailable('TeachingDemos')"
