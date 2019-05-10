@@ -600,4 +600,43 @@ interactionplot <- function () {
   dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
 }
 
+scatterplot <- function () {
+  defaults <- list(initial.group = NULL,initial.response = NULL)
+  dialog.values <- getDialog("scatterplot", defaults)
+  initializeDialog(title = gettextRcmdr("Scatter Plot"), use.tabs = FALSE)
+  dataFrame <- tkframe(top)
+  groupBox <- variableListBox(dataFrame, Factors(), selectmode = "multiple",
+                              title = gettextRcmdr("Factors (pick one or more)"),
+                              initialSelection = varPosn(dialog.values$initial.group, "factor"))
+  responseBox <- variableListBox(dataFrame, Numeric(), title = gettextRcmdr("Response Variable (pick one)"),
+                                 initialSelection = varPosn(dialog.values$initial.response, "numeric"))
+
+  onOK <- function() {
+    groups <- getSelection(groupBox)
+    response <- getSelection(responseBox)
+
+    if (length(groups) == 0) {
+      errorCondition(recall = mainplot, message = gettextRcmdr("You must select at least one factor."))
+      return()}
+    if (length(response) == 0) {
+      errorCondition(recall = mainplot, message = gettextRcmdr("You must select at least one factor."))
+      return()}
+
+    putDialog ("scatterplot", list (initial.group = groups, initial.response = response))
+    closeDialog()
+
+    .activeDataSet <- ActiveDataSet()
+    groups.list <- paste(paste(groups, sep = ""), collapse = ", ")
+    doItAndPrint(paste("scatter.plot(", .activeDataSet,",",groups.list,",",response, ")"))
+    tkfocus(CommanderWindow())
+  }
+
+  OKCancelHelp(helpSubject = "Anova", model = TRUE, reset = "scatterplot", apply = "scatterplot")
+
+  tkgrid(getFrame(groupBox), labelRcmdr(dataFrame, text="  "), sticky = "nw")
+  tkgrid(getFrame(responseBox), labelRcmdr(dataFrame, text=" "), sticky = "nw")
+  tkgrid(dataFrame, sticky="nw")
+  tkgrid(buttonsFrame, sticky = "w")
+  dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
+}
 
