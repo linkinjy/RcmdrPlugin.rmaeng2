@@ -3,26 +3,18 @@ remove  normalDistributionPlot    ""		""										""							""						""
 remove  tDistributionPlot		""		""										""							""						""
 remove	gammaDistributionPlot	""		""										""							""						""
 remove	discreteMenu            ""		""										""							""						""
-
 menu    rmaeng2Menu       topMenu         ""                                      ""                          ""                      ""
 item    topMenu         cascade         "rmaeng2"                                 rmaeng2Menu                   ""                      "packageAvailable('rmaeng2")"
-
-# design
 menu    designMenu       designingMenu         ""                                      ""                          ""                      ""
 item    designingMenu       cascade         "Design"                    designMenu                          ""                      ""
 item    designMenu       command         "Random number table of oneway"                    onerandomtable          ""                      "packageAvailable('rmaeng2")"
 item    designMenu       command         "Random number table of latin and greco"                    latinrandomtable          ""                      "packageAvailable('rmaeng2")"
 item    designMenu       command         "Random number table of multiway"                    multirandomtable          ""                      "packageAvailable('rmaeng2")"
-
-#analyze
 menu    analyzeMenu       analyzingMenu         ""                                      ""                          ""                      ""
 item    analyzingMenu       cascade         "Analyze"                    analyzeMenu                          ""                      ""
 item    analyzeMenu       command         "Multiway anova"                    mmultiWayAnova          ""                      "packageAvailable('rmaeng2")"
 item    analyzeMenu       command         "Main effect plot"                    mainplot          ""                      "packageAvailable('rmaeng2")"
 item    analyzeMenu       command         "Interaction plot"                    interactionplot          ""                      "packageAvailable('rmaeng2")"
 item    analyzeMenu       command         "Scatter plot"                    sscatterplot          ""                      "packageAvailable('rmaeng2")"
-
-
-#estimate
 menu    estimateMenu       estimatingMenu         ""                                      ""                          ""                      ""
 item    estimatingMenu       cascade         "Estimation"                    estimateMenu                          ""                      ""
