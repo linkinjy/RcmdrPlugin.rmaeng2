@@ -614,14 +614,12 @@ scatterplot <- function () {
   onOK <- function() {
     groups <- getSelection(groupBox)
     response <- getSelection(responseBox)
-
     if (length(groups) == 0) {
-      errorCondition(recall = mainplot, message = gettextRcmdr("You must select at least one factor."))
+      errorCondition(recall = scatterplot, message = gettextRcmdr("You must select at least one factor."))
       return()}
     if (length(response) == 0) {
-      errorCondition(recall = mainplot, message = gettextRcmdr("You must select at least one factor."))
+      errorCondition(recall = scatterplot, message = gettextRcmdr("You must select at least one factor."))
       return()}
-
     putDialog ("scatterplot", list (initial.group = groups, initial.response = response))
     closeDialog()
 
@@ -639,4 +637,5 @@ scatterplot <- function () {
   tkgrid(buttonsFrame, sticky = "w")
   dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
 }
+
 
