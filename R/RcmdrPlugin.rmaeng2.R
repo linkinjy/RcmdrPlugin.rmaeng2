@@ -574,13 +574,13 @@ interactionplot <- function () {
     groups <- getSelection(groupBox)
     response <- getSelection(responseBox)
     if (length(groups) == 0) {
-      errorCondition(recall = mainplot, message = gettextRcmdr("You must select two factor."))
+      errorCondition(recall = interactionplot, message = gettextRcmdr("You must select two factor."))
       return()}
     if (length(groups) == 1) {
-      errorCondition(recall = mainplot, message = gettextRcmdr("You must select two factor."))
+      errorCondition(recall = interactionplot, message = gettextRcmdr("You must select two factor."))
       return()}
     if (length(response) == 0) {
-      errorCondition(recall = mainplot, message = gettextRcmdr("You must select at least one factor."))
+      errorCondition(recall = interactionlot, message = gettextRcmdr("You must select at least one factor."))
       return()}
     putDialog ("interactionplot", list (initial.group = groups, initial.response = response))
     closeDialog()
@@ -600,9 +600,9 @@ interactionplot <- function () {
   dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
 }
 
-scatterplot <- function () {
+sscatterplot <- function () {
   defaults <- list(initial.group = NULL,initial.response = NULL)
-  dialog.values <- getDialog("scatterplot", defaults)
+  dialog.values <- getDialog("sscatterplot", defaults)
   initializeDialog(title = gettextRcmdr("Scatter Plot"), use.tabs = FALSE)
   dataFrame <- tkframe(top)
   groupBox <- variableListBox(dataFrame, Factors(), selectmode = "multiple",
@@ -615,12 +615,12 @@ scatterplot <- function () {
     groups <- getSelection(groupBox)
     response <- getSelection(responseBox)
     if (length(groups) == 0) {
-      errorCondition(recall = scatterplot, message = gettextRcmdr("You must select at least one factor."))
+      errorCondition(recall = sscatterplot, message = gettextRcmdr("You must select at least one factor."))
       return()}
     if (length(response) == 0) {
-      errorCondition(recall = scatterplot, message = gettextRcmdr("You must select at least one factor."))
+      errorCondition(recall = sscatterplot, message = gettextRcmdr("You must select at least one factor."))
       return()}
-    putDialog ("scatterplot", list (initial.group = groups, initial.response = response))
+    putDialog ("sscatterplot", list (initial.group = groups, initial.response = response))
     closeDialog()
 
     .activeDataSet <- ActiveDataSet()
@@ -629,7 +629,7 @@ scatterplot <- function () {
     tkfocus(CommanderWindow())
   }
 
-  OKCancelHelp(helpSubject = "Anova", model = TRUE, reset = "scatterplot", apply = "scatterplot")
+  OKCancelHelp(helpSubject = "Anova", model = TRUE, reset = "sscatterplot", apply = "sscatterplot")
 
   tkgrid(getFrame(groupBox), labelRcmdr(dataFrame, text="  "), sticky = "nw")
   tkgrid(getFrame(responseBox), labelRcmdr(dataFrame, text=" "), sticky = "nw")

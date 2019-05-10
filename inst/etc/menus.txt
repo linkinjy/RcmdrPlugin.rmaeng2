@@ -17,5 +17,5 @@ item    rmaeng2Menu       command         "Random number table of latin and grec
 item    rmaeng2Menu       command         "Random number table of multiway"                    multirandomtable          ""                      ""
 item    rmaeng2Menu       command         "Main effect plot"                    mainplot          ""                      ""
 item    rmaeng2Menu       command         "Interaction plot"                    interactionplot          ""                      ""
-item    rmaeng2Menu       command         "Scatter plot"                    scatterplot          ""                      ""
+item    rmaeng2Menu       command         "Scatter plot"                    sscatterplot          ""                      ""
 item    topMenu         cascade         "rmaeng2"                                 rmaeng2Menu                   ""                      "packageAvailable('TeachingDemos')"
