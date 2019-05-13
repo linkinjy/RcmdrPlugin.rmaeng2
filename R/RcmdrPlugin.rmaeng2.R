@@ -375,3 +375,148 @@ sscatterplot <- function () {
   tkgrid(buttonsFrame, sticky = "w")
   dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
 }
+
+oneerror <- function () {
+  defaults <- list(initial.group = NULL,initial.response = NULL,initial.alpha="0.05")
+  dialog.values <- getDialog("oneerror", defaults)
+  initializeDialog(title = gettextRcmdr("Estimate of One Way's Error Variance"), use.tabs = FALSE)
+  dataFrame <- tkframe(top)
+  groupBox <- variableListBox(dataFrame, Factors(), selectmode = "single",
+                              title = gettextRcmdr("Factors (pick one)"),
+                              initialSelection = varPosn(dialog.values$initial.group, "factor"))
+  responseBox <- variableListBox(dataFrame, Numeric(), title = gettextRcmdr("Response Variable (pick one)"),
+                                 initialSelection = varPosn(dialog.values$initial.response, "numeric"))
+
+  onOK <- function() {
+
+    groups <- getSelection(groupBox)
+    response <- getSelection(responseBox)
+    al <- tclvalue(alpha)
+
+    if (length(groups) == 0) {
+      errorCondition(recall = sscatterplot, message = gettextRcmdr("You must select at least one factor."))
+      return()}
+    if (length(response) == 0) {
+      errorCondition(recall = sscatterplot, message = gettextRcmdr("You must select at least one factor."))
+      return()}
+
+    putDialog ("oneerror", list (initial.group = groups, initial.response = response, initial.alpha = al))
+    closeDialog()
+
+    .activeDataSet <- ActiveDataSet()
+    groups.list <- paste(paste(groups, sep = ""), collapse = ", ")
+    doItAndPrint(paste("error.var(", response,"~",groups.list,",",.activeDataSet,",",al, ")", sep = ""))
+    tkfocus(CommanderWindow())
+  }
+
+  OKCancelHelp(helpSubject = "Anova", model = TRUE, reset = "oneerror", apply = "oneerror")
+
+  alphaFrame <- tkframe(dataFrame)
+  alpha <- tclVar(dialog.values$initial.alpha)
+  alphaField <- ttkentry(alphaFrame, width = "12", textvariable = alpha)
+
+  tkgrid(getFrame(groupBox), labelRcmdr(dataFrame, text="  "), sticky = "nw")
+  tkgrid(labelRcmdr(alphaFrame, text = gettextRcmdr("Alpha"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(alphaField, sticky="w")
+  tkgrid(alphaFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
+  tkgrid(getFrame(responseBox), labelRcmdr(dataFrame, text=" "), sticky = "nw")
+  tkgrid(dataFrame, sticky="nw")
+  tkgrid(buttonsFrame, sticky = "w")
+  dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
+}
+
+usermeandiff <- function () {
+  defaults <- list(initial.group = NULL,initial.response = NULL,initial.method="hsd")
+  dialog.values <- getDialog("usermeandiff", defaults)
+  initializeDialog(title = gettextRcmdr("Population Mean Difference : Factor and Interaction (User's Setting)"), use.tabs = FALSE)
+  dataFrame <- tkframe(top)
+  groupBox <- variableListBox(dataFrame, Factors(), selectmode = "multiple",
+                              title = gettextRcmdr("Factors (pick one or more)"),
+                              initialSelection = varPosn(dialog.values$initial.group, "factor"))
+  responseBox <- variableListBox(dataFrame, Numeric(), title = gettextRcmdr("Response Variable (pick one)"),
+                                 initialSelection = varPosn(dialog.values$initial.response, "numeric"))
+
+  onOK <- function() {
+    groups <- getSelection(groupBox)
+    response <- getSelection(responseBox)
+    methodd <- as.character(tclvalue(method))
+
+    if (length(groups) == 0) {
+      errorCondition(recall = sscatterplot, message = gettextRcmdr("You must select at least one factor."))
+      return()}
+    if (length(response) == 0) {
+      errorCondition(recall = sscatterplot, message = gettextRcmdr("You must select at least one factor."))
+      return()}
+
+    putDialog ("usermeandiff", list (initial.group = groups, initial.response = response, initial.method = methodd))
+    closeDialog()
+
+    groups.list <- paste(paste(groups, sep = ""), collapse = "+")
+    doItAndPrint(paste("mean.diff(", response,"~",groups.list,",","method=",'"',methodd,'"',")", sep = ""))
+    tkfocus(CommanderWindow())
+  }
+
+  OKCancelHelp(helpSubject = "Anova", model = TRUE, reset = "usermeandiff", apply = "usermeandiff")
+
+  methodFrame <- tkframe(dataFrame)
+  method <- tclVar(dialog.values$initial.method)
+  methodField <- ttkentry(methodFrame, width = "12", textvariable = method)
+
+  tkgrid(getFrame(groupBox), labelRcmdr(dataFrame, text="  "), sticky = "nw")
+  tkgrid(getFrame(responseBox), labelRcmdr(dataFrame, text=" "), sticky = "nw")
+  tkgrid(labelRcmdr(methodFrame, text = gettextRcmdr("Method
+(input : hsd / lsd / bonferroni / scheffe / newmankeuls / duncan)"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(methodField, sticky="w")
+  tkgrid(methodFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
+  tkgrid(dataFrame, sticky="nw")
+  tkgrid(buttonsFrame, sticky = "w")
+  dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
+}
+
+meandiff <- function () {
+  defaults <- list(initial.group = NULL,initial.response = NULL,initial.method="hsd")
+  dialog.values <- getDialog("meandiff", defaults)
+  initializeDialog(title = gettextRcmdr("Population Mean Difference : All Factor and Interaction"), use.tabs = FALSE)
+  dataFrame <- tkframe(top)
+  groupBox <- variableListBox(dataFrame, Factors(), selectmode = "multiple",
+                              title = gettextRcmdr("Factors (pick one or more)"),
+                              initialSelection = varPosn(dialog.values$initial.group, "factor"))
+  responseBox <- variableListBox(dataFrame, Numeric(), title = gettextRcmdr("Response Variable (pick one)"),
+                                 initialSelection = varPosn(dialog.values$initial.response, "numeric"))
+
+  onOK <- function() {
+    groups <- getSelection(groupBox)
+    response <- getSelection(responseBox)
+    methodd <- as.character(tclvalue(method))
+
+    if (length(groups) == 0) {
+      errorCondition(recall = sscatterplot, message = gettextRcmdr("You must select at least one factor."))
+      return()}
+    if (length(response) == 0) {
+      errorCondition(recall = sscatterplot, message = gettextRcmdr("You must select at least one factor."))
+      return()}
+
+    putDialog ("meandiff", list (initial.group = groups, initial.response = response, initial.method = methodd))
+    closeDialog()
+
+    groups.list <- paste(paste(groups, sep = ""), collapse = "*")
+    doItAndPrint(paste("mean.diff(", response,"~",groups.list,",","method=",'"',methodd,'"',")", sep = ""))
+    tkfocus(CommanderWindow())
+  }
+
+  OKCancelHelp(helpSubject = "Anova", model = TRUE, reset = "meandiff", apply = "meandiff")
+
+  methodFrame <- tkframe(dataFrame)
+  method <- tclVar(dialog.values$initial.method)
+  methodField <- ttkentry(methodFrame, width = "12", textvariable = method)
+
+  tkgrid(getFrame(groupBox), labelRcmdr(dataFrame, text="  "), sticky = "nw")
+  tkgrid(getFrame(responseBox), labelRcmdr(dataFrame, text=" "), sticky = "nw")
+  tkgrid(labelRcmdr(methodFrame, text = gettextRcmdr("Method
+(input : hsd / lsd / bonferroni / scheffe / newmankeuls / duncan)"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(methodField, sticky="w")
+  tkgrid(methodFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
+  tkgrid(dataFrame, sticky="nw")
+  tkgrid(buttonsFrame, sticky = "w")
+  dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
+}
