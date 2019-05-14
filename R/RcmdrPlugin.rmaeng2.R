@@ -698,3 +698,150 @@ central <- function () {
   dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
 }
 
+designsplit <- function () {
+  defaults <- list(initial.factor1 = "c(1,2,3)", initial.factor2 = "c(1,2,3)", initial.repet="1", initial.seed="0", initial.random="TRUE", initial.std="FALSE")
+  dialog.values <- getDialog("designsplit", defaults)
+  initializeDialog(title = gettextRcmdr("Random Number Table of Split Method"), use.tabs = FALSE)
+  mainFrame <- tkframe(top)
+
+  onOK <- function() {
+
+    factor11<-as.character(tclvalue(factor1))
+    factor22<-as.character(tclvalue(factor2))
+    repe<-tclvalue(repet)
+    sed<-tclvalue(seed)
+    randoms<-as.character(tclvalue(random))
+    sttd<-as.character(tclvalue(std))
+
+    putDialog ("designsplit", list (initial.factor1 = factor11, initial.factor2 = factor22, initial.repet = repe, initial.seed = sed,initial.random = randoms, initial.std = sttd))
+    closeDialog()
+
+    doItAndPrint(paste("design.split(", factor11,",", factor22,",","r=",repe,",","seed=",sed,",","randomization=", randoms,"," ,"std=",sttd,")", sep = ""))
+    tkfocus(CommanderWindow())
+  }
+
+  OKCancelHelp(helpSubject = "Anova", model = TRUE, reset = "designsplit", apply = "designsplit")
+
+  factor1Frame <- tkframe(mainFrame)
+  factor1 <- tclVar(dialog.values$initial.factor1)
+  factor1Field <- ttkentry(factor1Frame, width = "12", textvariable = factor1)
+
+  factor2Frame <- tkframe(mainFrame)
+  factor2 <- tclVar(dialog.values$initial.factor2)
+  factor2Field <- ttkentry(factor2Frame, width = "12", textvariable = factor2)
+
+  repetFrame <- tkframe(mainFrame)
+  repet <- tclVar(dialog.values$initial.repet)
+  repetField <- ttkentry(repetFrame, width = "12", textvariable = repet)
+
+  seedFrame <- tkframe(mainFrame)
+  seed <- tclVar(dialog.values$initial.seed)
+  seedField <- ttkentry(seedFrame, width = "12", textvariable = seed)
+
+  randomFrame <- tkframe(mainFrame)
+  random <- tclVar(dialog.values$initial.random)
+  randomField <- ttkentry(randomFrame, width = "12", textvariable = random)
+
+  stdFrame <- tkframe(mainFrame)
+  std <- tclVar(dialog.values$initial.std)
+  stdField <- ttkentry(stdFrame, width = "12", textvariable = std)
+
+
+  tkgrid(labelRcmdr(mainFrame, text="  "), sticky = "nw")
+  tkgrid(mainFrame, sticky="nw")
+  tkgrid(labelRcmdr(factor1Frame, text = gettextRcmdr("Level of Factor1"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(factor2Frame, text = gettextRcmdr("Level of Factor2"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(repetFrame, text = gettextRcmdr("Repeat"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(seedFrame, text = gettextRcmdr("Seed"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(randomFrame, text = gettextRcmdr("Randomize / TRUE or FALSE"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(stdFrame, text = gettextRcmdr("Standard Order / TRUE or FALSE"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(factor1Field, sticky="w")
+  tkgrid(factor2Field, sticky="w")
+  tkgrid(repetField, sticky="w")
+  tkgrid(seedField, sticky="w")
+  tkgrid(randomField, sticky="w")
+  tkgrid(stdField, sticky="w")
+  tkgrid(factor1Frame, labelRcmdr(mainFrame, text = " "), sticky = "nw")
+  tkgrid(factor2Frame, labelRcmdr(mainFrame, text = " "), sticky = "nw")
+  tkgrid(repetFrame, labelRcmdr(mainFrame, text = " "), sticky = "nw")
+  tkgrid(seedFrame, labelRcmdr(mainFrame, text = " "), sticky = "nw")
+  tkgrid(randomFrame, labelRcmdr(mainFrame, text = " "), sticky = "nw")
+  tkgrid(stdFrame, labelRcmdr(mainFrame, text = " "), sticky = "nw")
+  tkgrid(buttonsFrame, sticky = "w")
+  dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
+}
+
+qualaov <- function () {
+  defaults <- list(initial.group = NULL,initial.response = NULL,initial.repet="1",initial.row = "1", initial.column="1", initial.fac="1")
+  dialog.values <- getDialog("qualaov", defaults)
+  initializeDialog(title = gettextRcmdr("ANOVA of Qualitative Data"), use.tabs = FALSE)
+  dataFrame <- tkframe(top)
+  groupBox <- variableListBox(dataFrame, selectmode = "multiple",
+                              title = gettextRcmdr("Factors (pick one or more)"),
+                              initialSelection = varPosn(dialog.values$initial.group,"all"))
+  responseBox <- variableListBox(dataFrame, selectmode = "single"
+                                 ,title = gettextRcmdr("Response Variable (pick one)"),
+                                 initialSelection = varPosn(dialog.values$initial.response,"all"))
+
+  onOK <- function(){
+    groups <- getSelection(groupBox)
+    response <- getSelection(responseBox)
+    repe <- tclvalue(repet)
+    rows <- tclvalue(row)
+    columns <- tclvalue(column)
+    facc <- tclvalue(fac)
+
+    if (length(groups) == 0) {
+      errorCondition(recall = sscatterplot, message = gettextRcmdr("You must select at least one factor."))
+      return()}
+    if (length(response) == 0) {
+      errorCondition(recall = sscatterplot, message = gettextRcmdr("You must select at least one factor."))
+      return()}
+
+    putDialog ("qualaov", list (initial.group = groups, initial.response = response, initial.repet = repe, initial.row = rows, initial.column = columns, initial.fac = facc))
+    closeDialog()
+
+    .activeDataSet <- ActiveDataSet()
+    groups.list <- paste(paste(groups, sep = ""), collapse = "+")
+    doItAndPrint(paste("qual.aov(", response,"~",groups.list,",",.activeDataSet,",","r=",repe,",", "i=",rows,",","j=",columns,",","fac=",facc,")", sep = ""))
+    tkfocus(CommanderWindow())
+  }
+
+  OKCancelHelp(helpSubject = "Anova", model = TRUE, reset = "qualaov", apply = "qualaov")
+
+  repetFrame <- tkframe(dataFrame)
+  repet <- tclVar(dialog.values$initial.repet)
+  repetField <- ttkentry(repetFrame, width = "12", textvariable = repet)
+
+  rowFrame <- tkframe(dataFrame)
+  row <- tclVar(dialog.values$initial.row)
+  rowField <- ttkentry(rowFrame, width = "12", textvariable = row)
+
+  columnFrame <- tkframe(dataFrame)
+  column <- tclVar(dialog.values$initial.column)
+  columnField <- ttkentry(columnFrame, width = "12", textvariable = column)
+
+  facFrame <- tkframe(dataFrame)
+  fac <- tclVar(dialog.values$initial.fac)
+  facField <- ttkentry(facFrame, width = "12", textvariable = fac)
+
+  tkgrid(getFrame(groupBox), labelRcmdr(dataFrame, text="  "), sticky = "nw")
+  tkgrid(getFrame(responseBox), labelRcmdr(dataFrame, text=" "), sticky = "nw")
+  tkgrid(labelRcmdr(repetFrame, text = gettextRcmdr("Repeat"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(rowFrame, text = gettextRcmdr("Number of Row"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(columnFrame, text = gettextRcmdr("Number of Column"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(facFrame, text = gettextRcmdr("1 : One way / 2 : Two way"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(repetField, sticky="w")
+  tkgrid(rowField, sticky="w")
+  tkgrid(columnField, sticky="w")
+  tkgrid(facField, sticky="w")
+  tkgrid(repetFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
+  tkgrid(rowFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
+  tkgrid(columnFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
+  tkgrid(facFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
+  tkgrid(dataFrame, sticky="nw")
+  tkgrid(buttonsFrame, sticky = "w")
+  dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
+}
+
+
