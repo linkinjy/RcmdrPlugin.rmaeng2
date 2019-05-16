@@ -6,11 +6,11 @@ mmultiWayAnova <- function () {
   modelName <- tclVar(paste("AnovaModel.", getRcmdr("modelNumber"),
                             sep = ""))
   dataFrame <- tkframe(dataTab)
-  groupBox <- variableListBox(dataFrame, Factors(), selectmode = "multiple",
+  groupBox <- variableListBox(dataFrame, selectmode = "multiple",
                               title = gettextRcmdr("Factors (pick one or more)"),
-                              initialSelection = varPosn(dialog.values$initial.group, "factor"))
-  responseBox <- variableListBox(dataFrame, Numeric(), title = gettextRcmdr("Response Variable (pick one)"),
-                                 initialSelection = varPosn(dialog.values$initial.response, "numeric"))
+                              initialSelection = varPosn(dialog.values$initial.group,"all"))
+  responseBox <- variableListBox(dataFrame, title = gettextRcmdr("Response Variable (pick one)"),
+                                 initialSelection = varPosn(dialog.values$initial.response, "all"))
   onOK <- function() {
     modelValue <- trim.blanks(tclvalue(modelName))
     tab <- if (as.character(tkselect(notebook)) == dataTab$ID) 0 else 1
@@ -267,11 +267,11 @@ mainplot <- function () {
   dialog.values <- getDialog("mainplot", defaults)
   initializeDialog(title = gettextRcmdr("Main Effects Plot"), use.tabs = FALSE)
   dataFrame <- tkframe(top)
-  groupBox <- variableListBox(dataFrame, Factors(), selectmode = "single",
+  groupBox <- variableListBox(dataFrame, selectmode = "single",
                               title = gettextRcmdr("Factors (pick one)"),
-                              initialSelection = varPosn(dialog.values$initial.group, "factor"))
-  responseBox <- variableListBox(dataFrame, Numeric(), title = gettextRcmdr("Response Variable (pick one)"),
-                                 initialSelection = varPosn(dialog.values$initial.response, "numeric"))
+                              initialSelection = varPosn(dialog.values$initial.group, "all"))
+  responseBox <- variableListBox(dataFrame, title = gettextRcmdr("Response Variable (pick one)"),
+                                 initialSelection = varPosn(dialog.values$initial.response, "all"))
 
   onOK <- function() {
     groups <- getSelection(groupBox)
@@ -343,11 +343,11 @@ sscatterplot <- function () {
   dialog.values <- getDialog("sscatterplot", defaults)
   initializeDialog(title = gettextRcmdr("Scatter Plot"), use.tabs = FALSE)
   dataFrame <- tkframe(top)
-  groupBox <- variableListBox(dataFrame, Factors(), selectmode = "multiple",
+  groupBox <- variableListBox(dataFrame, selectmode = "multiple",
                               title = gettextRcmdr("Factors (pick one or more)"),
-                              initialSelection = varPosn(dialog.values$initial.group, "factor"))
-  responseBox <- variableListBox(dataFrame, Numeric(), title = gettextRcmdr("Response Variable (pick one)"),
-                                 initialSelection = varPosn(dialog.values$initial.response, "numeric"))
+                              initialSelection = varPosn(dialog.values$initial.group, "all"))
+  responseBox <- variableListBox(dataFrame, title = gettextRcmdr("Response Variable (pick one)"),
+                                 initialSelection = varPosn(dialog.values$initial.response, "all"))
 
   onOK <- function() {
     groups <- getSelection(groupBox)
@@ -381,11 +381,11 @@ oneerror <- function () {
   dialog.values <- getDialog("oneerror", defaults)
   initializeDialog(title = gettextRcmdr("Estimate of One Way's Error Variance"), use.tabs = FALSE)
   dataFrame <- tkframe(top)
-  groupBox <- variableListBox(dataFrame, Factors(), selectmode = "single",
+  groupBox <- variableListBox(dataFrame, selectmode = "single",
                               title = gettextRcmdr("Factors (pick one)"),
-                              initialSelection = varPosn(dialog.values$initial.group, "factor"))
-  responseBox <- variableListBox(dataFrame, Numeric(), title = gettextRcmdr("Response Variable (pick one)"),
-                                 initialSelection = varPosn(dialog.values$initial.response, "numeric"))
+                              initialSelection = varPosn(dialog.values$initial.group, "all"))
+  responseBox <- variableListBox(dataFrame, title = gettextRcmdr("Response Variable (pick one)"),
+                                 initialSelection = varPosn(dialog.values$initial.response, "all"))
 
   onOK <- function() {
 
@@ -430,11 +430,11 @@ usermeandiff <- function () {
   dialog.values <- getDialog("usermeandiff", defaults)
   initializeDialog(title = gettextRcmdr("Population Mean Difference : Factor and Interaction (User's Setting)"), use.tabs = FALSE)
   dataFrame <- tkframe(top)
-  groupBox <- variableListBox(dataFrame, Factors(), selectmode = "multiple",
+  groupBox <- variableListBox(dataFrame, selectmode = "multiple",
                               title = gettextRcmdr("Factors (pick one or more)"),
-                              initialSelection = varPosn(dialog.values$initial.group, "factor"))
-  responseBox <- variableListBox(dataFrame, Numeric(), title = gettextRcmdr("Response Variable (pick one)"),
-                                 initialSelection = varPosn(dialog.values$initial.response, "numeric"))
+                              initialSelection = varPosn(dialog.values$initial.group, "all"))
+  responseBox <- variableListBox(dataFrame, title = gettextRcmdr("Response Variable (pick one)"),
+                                 initialSelection = varPosn(dialog.values$initial.response, "all"))
 
   onOK <- function() {
     groups <- getSelection(groupBox)
@@ -478,11 +478,11 @@ meandiff <- function () {
   dialog.values <- getDialog("meandiff", defaults)
   initializeDialog(title = gettextRcmdr("Population Mean Difference : All Factor and Interaction"), use.tabs = FALSE)
   dataFrame <- tkframe(top)
-  groupBox <- variableListBox(dataFrame, Factors(), selectmode = "multiple",
+  groupBox <- variableListBox(dataFrame, selectmode = "multiple",
                               title = gettextRcmdr("Factors (pick one or more)"),
-                              initialSelection = varPosn(dialog.values$initial.group, "factor"))
-  responseBox <- variableListBox(dataFrame, Numeric(), title = gettextRcmdr("Response Variable (pick one)"),
-                                 initialSelection = varPosn(dialog.values$initial.response, "numeric"))
+                              initialSelection = varPosn(dialog.values$initial.group, "all"))
+  responseBox <- variableListBox(dataFrame, title = gettextRcmdr("Response Variable (pick one)"),
+                                 initialSelection = varPosn(dialog.values$initial.response, "all"))
 
   onOK <- function() {
     groups <- getSelection(groupBox)
