@@ -1,103 +1,53 @@
-mmultiWayAnova <- function () {
-  defaults <- list(initial.group = NULL, initial.response = NULL, initial.confidenceLevel=".95", initial.posthoc="hsd", initial.tab=0, initial.label = NULL)
-  dialog.values <- getDialog("multiWayAnova", defaults)
-  initializeDialog(title = gettextRcmdr("Multi-Way Analysis of Variance"), use.tabs = TRUE)
-  UpdateModelNumber()
-  modelName <- tclVar(paste("AnovaModel.", getRcmdr("modelNumber"),
-                            sep = ""))
-  dataFrame <- tkframe(dataTab)
+aanova <- function () {
+  defaults <- list(initial.group = NULL, initial.response = NULL, initial.formul = "")
+  dialog.values <- getDialog("aanova", defaults)
+  initializeDialog(title = gettextRcmdr("분산분석"))
+  dataFrame <- tkframe(top)
   groupBox <- variableListBox(dataFrame, selectmode = "multiple",
                               title = gettextRcmdr("Factors (pick one or more)"),
-                              initialSelection = varPosn(dialog.values$initial.group,"all"))
+                              initialSelection = varPosn(dialog.values$initial.group, "all"))
   responseBox <- variableListBox(dataFrame, title = gettextRcmdr("Response Variable (pick one)"),
                                  initialSelection = varPosn(dialog.values$initial.response, "all"))
+
   onOK <- function() {
-    modelValue <- trim.blanks(tclvalue(modelName))
-    tab <- if (as.character(tkselect(notebook)) == dataTab$ID) 0 else 1
     groups <- getSelection(groupBox)
-    if (length(groups) == 0) {
-      errorCondition(recall = multiWayAnova, message = gettextRcmdr("You must select at least one factor."))
-      return()
-    }
     response <- getSelection(responseBox)
+    formull <- as.character(tclvalue(formul))
+
+    if (length(groups) == 0) {
+      errorCondition(recall = aanova, message = gettextRcmdr("You must select at least one factor."))
+      return()}
     if (length(response) == 0) {
-      errorCondition(recall = multiWayAnova, message = gettextRcmdr("You must select a response variable."))
-      return()
-    }
-
-    level<-tclvalue(confidenceLevel)
-    posthoc <- as.character(tclvalue(posthocVariable))
-
-    if (!is.valid.name(modelValue)) {
-      UpdateModelNumber(-1)
-      errorCondition(recall = multiWayAnova, message = sprintf(gettextRcmdr("\"%s\" is not a valid name."),
-                                                               modelValue))
-      return()
-    }
-    if (is.element(modelValue, listAOVModels())) {
-      if ("no" == tclvalue(checkReplace(modelValue, type = gettextRcmdr("Model")))) {
-        UpdateModelNumber(-1)
-        tkdestroy(dataTab)
-        multiWayAnova()
-        return()
-      }
-    }
-    putDialog ("multiWayAnova", list (initial.group = groups, initial.response = response, initial.confidenceLevel = level, initial.posthoc = posthoc, initial.tab = tab,
-                                      initial.label = .groupsLabel))
+      errorCondition(recall = aanova, message = gettextRcmdr("You must select at least one factor."))
+      return()}
+    putDialog ("aanova", list (initial.group = groups, initial.response = response, initial.formul = formull))
     closeDialog()
 
     .activeDataSet <- ActiveDataSet()
     groups.list <- paste(paste(groups, sep = ""), collapse = ", ")
-    doItAndPrint(paste(modelValue, " <- lm(", response,
-                       " ~ ", paste(groups, collapse = "*"), ", data=",
-                       .activeDataSet, ", contrasts=list(", paste(paste(groups, '="contr.Sum"'), collapse=", "), "))", sep = ""))
-    doItAndPrint(paste("Anova(", modelValue, ")", sep = ""))
-    doItAndPrint(paste("with(", .activeDataSet, ", (tapply(", response,
-                       ", list(", groups.list, "), mean, na.rm=TRUE))) # means",
-                       sep = ""))
-    doItAndPrint(paste("with(", .activeDataSet, ", (tapply(", response,
-                       ", list(", groups.list, "), sd, na.rm=TRUE))) # std. deviations",
-                       sep = ""))
-    doItAndPrint(paste("mean.diff(", response, " ~ ", paste(groups, collapse = "*"), ", method=", '"',posthoc,'"',")", sep = ""))
-    doItAndPrint(paste("xtabs(~ ", paste(groups, collapse=" + "), ", data=", .activeDataSet, ") # counts", sep=""))
-    putRcmdr(modelValue)
-    putRcmdr("modelWithSubset", FALSE)
+    doItAndPrint(paste("aov.t(", response,"~", formull, ")", sep = ""))
     tkfocus(CommanderWindow())
   }
 
-  OKCancelHelp(helpSubject = "Anova", model = TRUE, reset = "multiWayAnova", apply = "multiWayAnova")
-  optionsFrame <- tkframe(optionsTab)
-  radioButtons(optionsFrame, name = "posthoc", buttons = c("hsd","lsd","bonferroni","duncan","scheffe","newmankeuls"), values = c("hsd","lsd","bonferroni","duncan","scheffe","newmankeuls"),
-               labels = gettextRcmdr(c("Tukey's HSD", "Fisher's LSD", "Bonferroni", "Duncan", "Scheffe", "Newmankeuls")), title = gettextRcmdr("PostHoc Test"),
-               initialValue = dialog.values$initial.posthoc)
+  OKCancelHelp(helpSubject = "Anova", model = TRUE, reset = "aanova", apply = "aanova")
 
-  hsd <- c("hsd")
-  lsd <- c("lsd")
-  bonferroni <- c("bonferroni")
-  duncan <- c("duncan")
-  scheffe <- c("scheffe")
-  newmankeuls <- c("newmankeuls")
+  formulFrame <- tkframe(dataFrame)
+  formul <- tclVar(dialog.values$initial.formul)
+  formulField <- ttkentry(formulFrame, width = "20", textvariable = formul)
 
-  confidenceFrame <- tkframe(optionsFrame)
-  confidenceLevel <- tclVar(dialog.values$initial.confidenceLevel)
-  confidenceField <- ttkentry(confidenceFrame, width = "6", textvariable = confidenceLevel)
-
+  tkgrid(labelRcmdr(formulFrame, text = gettextRcmdr("Formula / ex) a+b+c+a*b+b*c+c*a+a*b*c"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(formulField, sticky="w")
+  tkgrid(formulFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
   tkgrid(getFrame(groupBox), labelRcmdr(dataFrame, text="  "), getFrame(responseBox), sticky = "nw")
-  tkgrid(dataFrame, sticky="nw")
-  tkgrid(labelRcmdr(confidenceFrame, text = gettextRcmdr("Confidence Level"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
-  tkgrid(confidenceField, sticky="w")
-  groupsLabel(optionsTab, groupsBox = groupBox, initialText = dialog.values$initial.label)
-  tkgrid(posthocFrame, labelRcmdr(optionsFrame, text = " "),
-         confidenceFrame, labelRcmdr(optionsFrame, text = " "), sticky = "nw")
-  tkgrid(optionsFrame, sticky = "nw")
+  tkgrid(dataFrame, sticky="w")
   tkgrid(buttonsFrame, sticky = "w")
-  dialogSuffix(use.tabs = TRUE, grid.buttons = TRUE)
+  dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
 }
 
 onerandomtable <- function () {
   defaults <- list(initial.factorname = 'c("a","b","c")', initial.repetition = "", initial.seed="0", initial.std="FALSE")
   dialog.values <- getDialog("onerandomtable", defaults)
-  initializeDialog(title = gettextRcmdr("Random Number Table of One Way"), use.tabs = FALSE)
+  initializeDialog(title = gettextRcmdr("일원배치법 난수표"), use.tabs = FALSE)
   mainFrame <- tkframe(top)
   UpdateModelNumber()
   modelName <- tclVar(paste("AnovaModel.", getRcmdr("modelNumber"),
@@ -146,10 +96,10 @@ onerandomtable <- function () {
   tkgrid(labelRcmdr(modelFrame, text = gettextRcmdr("Enter name for model: ")),
          model, sticky = "w")
   tkgrid(modelFrame, sticky = "w")
-  tkgrid(labelRcmdr(factorFrame, text = gettextRcmdr("Factor/input factor's name in quotation"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
-  tkgrid(labelRcmdr(repetFrame, text = gettextRcmdr("Repet"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(factorFrame, text = gettextRcmdr("요인"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(repetFrame, text = gettextRcmdr("반복수"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
   tkgrid(labelRcmdr(seedFrame, text = gettextRcmdr("Seed"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
-  tkgrid(labelRcmdr(stdFrame, text = gettextRcmdr("Std/TRUE or FALSE"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(stdFrame, text = gettextRcmdr("표준순서 / TRUE : 표준순서 or FALSE : 실행 순서"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
   tkgrid(factorField, sticky="w")
   tkgrid(repetField, sticky="w")
   tkgrid(seedField, sticky="w")
@@ -166,7 +116,7 @@ onerandomtable <- function () {
 latinrandomtable <- function () {
   defaults <- list(initial.factornumber = "3", initial.greco = "FALSE", initial.seed="0", initial.std="FALSE")
   dialog.values <- getDialog("latinrandomtable", defaults)
-  initializeDialog(title = gettextRcmdr("Random Number Table of Latin Square"), use.tabs = FALSE)
+  initializeDialog(title = gettextRcmdr("라틴 및 그레코라틴 난수표"), use.tabs = FALSE)
   mainFrame <- tkframe(top)
   UpdateModelNumber()
   modelName <- tclVar(paste("AnovaModel.", getRcmdr("modelNumber"),
@@ -215,10 +165,10 @@ latinrandomtable <- function () {
   tkgrid(labelRcmdr(modelFrame, text = gettextRcmdr("Enter name for model: ")),
          model, sticky = "w")
   tkgrid(modelFrame, sticky = "w")
-  tkgrid(labelRcmdr(factorFrame, text = gettextRcmdr("Number of Factor / N*N latin square"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
-  tkgrid(labelRcmdr(grecoFrame, text = gettextRcmdr("Latin or Greco / TRUE = Greco, FALSE = Latin"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(factorFrame, text = gettextRcmdr("요인의 수 / N*N 라틴방격"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(grecoFrame, text = gettextRcmdr("라틴, 그레코 / TRUE = 그레코, FALSE = 라틴"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
   tkgrid(labelRcmdr(seedFrame, text = gettextRcmdr("Seed"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
-  tkgrid(labelRcmdr(stdFrame, text = gettextRcmdr("Std/TRUE or FALSE"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(stdFrame, text = gettextRcmdr("표준순서 / TRUE : 표준순서 or FALSE : 실행 순서"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
   tkgrid(factorField, sticky="w")
   tkgrid(grecoField, sticky="w")
   tkgrid(seedField, sticky="w")
@@ -235,7 +185,7 @@ latinrandomtable <- function () {
 multirandomtable <- function () {
   defaults <- list(initial.factornumber = "c(2,3)", initial.repetition = "", initial.seed="0", initial.std="FALSE")
   dialog.values <- getDialog("multirandomtable", defaults)
-  initializeDialog(title = gettextRcmdr("Random Number Table of Multi Way"), use.tabs = FALSE)
+  initializeDialog(title = gettextRcmdr("다원배치법 난수표"), use.tabs = FALSE)
   mainFrame <- tkframe(top)
   UpdateModelNumber()
   modelName <- tclVar(paste("AnovaModel.", getRcmdr("modelNumber"),
@@ -283,10 +233,10 @@ multirandomtable <- function () {
   tkgrid(labelRcmdr(modelFrame, text = gettextRcmdr("Enter name for model: ")),
          model, sticky = "w")
   tkgrid(modelFrame, sticky = "w")
-  tkgrid(labelRcmdr(factorFrame, text = gettextRcmdr("Factor/input Each factor's Level"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
-  tkgrid(labelRcmdr(repetFrame, text = gettextRcmdr("Repet"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(factorFrame, text = gettextRcmdr("요인 / c(A인자 수준수, B인자 수준수)"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(repetFrame, text = gettextRcmdr("반복수"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
   tkgrid(labelRcmdr(seedFrame, text = gettextRcmdr("Seed"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
-  tkgrid(labelRcmdr(stdFrame, text = gettextRcmdr("Std/TRUE or FALSE"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(stdFrame, text = gettextRcmdr("표준순서 / TRUE : 표준순서 or FALSE : 실행 순서"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
   tkgrid(factorField, sticky="w")
   tkgrid(repetField, sticky="w")
   tkgrid(seedField, sticky="w")
@@ -303,10 +253,10 @@ multirandomtable <- function () {
 mainplot <- function () {
   defaults <- list(initial.group = NULL,initial.response = NULL)
   dialog.values <- getDialog("mainplot", defaults)
-  initializeDialog(title = gettextRcmdr("Main Effects Plot"), use.tabs = FALSE)
+  initializeDialog(title = gettextRcmdr("주효과도"), use.tabs = FALSE)
   dataFrame <- tkframe(top)
   groupBox <- variableListBox(dataFrame, selectmode = "single",
-                              title = gettextRcmdr("Factors (pick one)"),
+                              title = gettextRcmdr("요인 (하나 선택)"),
                               initialSelection = varPosn(dialog.values$initial.group, "all"))
   responseBox <- variableListBox(dataFrame, title = gettextRcmdr("Response Variable (pick one)"),
                                  initialSelection = varPosn(dialog.values$initial.response, "all"))
@@ -338,10 +288,10 @@ mainplot <- function () {
 interactionplot <- function () {
   defaults <- list(initial.group = NULL,initial.response = NULL)
   dialog.values <- getDialog("interactionplot", defaults)
-  initializeDialog(title = gettextRcmdr("Interaction Plot"), use.tabs = FALSE)
+  initializeDialog(title = gettextRcmdr("교호작용도"), use.tabs = FALSE)
   dataFrame <- tkframe(top)
   groupBox <- variableListBox(dataFrame, Factors(), selectmode = "multiple",
-                              title = gettextRcmdr("Factors (pick two)"),
+                              title = gettextRcmdr("요인 (두개 선택)"),
                               initialSelection = varPosn(dialog.values$initial.group, "factor"))
   responseBox <- variableListBox(dataFrame, Numeric(), title = gettextRcmdr("Response Variable (pick one)"),
                                  initialSelection = varPosn(dialog.values$initial.response, "numeric"))
@@ -379,10 +329,10 @@ interactionplot <- function () {
 sscatterplot <- function () {
   defaults <- list(initial.group = NULL,initial.response = NULL)
   dialog.values <- getDialog("sscatterplot", defaults)
-  initializeDialog(title = gettextRcmdr("Scatter Plot"), use.tabs = FALSE)
+  initializeDialog(title = gettextRcmdr("산점도"), use.tabs = FALSE)
   dataFrame <- tkframe(top)
   groupBox <- variableListBox(dataFrame, selectmode = "multiple",
-                              title = gettextRcmdr("Factors (pick one or more)"),
+                              title = gettextRcmdr("요인 (하나 이상 선택)"),
                               initialSelection = varPosn(dialog.values$initial.group, "all"))
   responseBox <- variableListBox(dataFrame, title = gettextRcmdr("Response Variable (pick one)"),
                                  initialSelection = varPosn(dialog.values$initial.response, "all"))
@@ -417,10 +367,10 @@ sscatterplot <- function () {
 oneerror <- function () {
   defaults <- list(initial.group = NULL,initial.response = NULL,initial.alpha="0.05")
   dialog.values <- getDialog("oneerror", defaults)
-  initializeDialog(title = gettextRcmdr("Estimate of One Way's Error Variance"), use.tabs = FALSE)
+  initializeDialog(title = gettextRcmdr("일원배치법 오차분산의 추정"), use.tabs = FALSE)
   dataFrame <- tkframe(top)
   groupBox <- variableListBox(dataFrame, selectmode = "single",
-                              title = gettextRcmdr("Factors (pick one)"),
+                              title = gettextRcmdr("요인 (하나 선택)"),
                               initialSelection = varPosn(dialog.values$initial.group, "all"))
   responseBox <- variableListBox(dataFrame, title = gettextRcmdr("Response Variable (pick one)"),
                                  initialSelection = varPosn(dialog.values$initial.response, "all"))
@@ -454,7 +404,7 @@ oneerror <- function () {
   alphaField <- ttkentry(alphaFrame, width = "12", textvariable = alpha)
 
   tkgrid(getFrame(groupBox), labelRcmdr(dataFrame, text="  "), sticky = "nw")
-  tkgrid(labelRcmdr(alphaFrame, text = gettextRcmdr("Alpha"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(alphaFrame, text = gettextRcmdr("알파"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
   tkgrid(alphaField, sticky="w")
   tkgrid(alphaFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
   tkgrid(getFrame(responseBox), labelRcmdr(dataFrame, text=" "), sticky = "nw")
@@ -466,7 +416,7 @@ oneerror <- function () {
 usermeandiff <- function () {
   defaults <- list(initial.group = NULL,initial.response = NULL,initial.method="hsd")
   dialog.values <- getDialog("usermeandiff", defaults)
-  initializeDialog(title = gettextRcmdr("Population Mean Difference : Factor and Interaction (User's Setting)"), use.tabs = FALSE)
+  initializeDialog(title = gettextRcmdr("모평균차 : 요인 및 교호작용 (사용자 설정)"), use.tabs = FALSE)
   dataFrame <- tkframe(top)
   groupBox <- variableListBox(dataFrame, selectmode = "multiple",
                               title = gettextRcmdr("Factors (pick one or more)"),
@@ -502,8 +452,8 @@ usermeandiff <- function () {
 
   tkgrid(getFrame(groupBox), labelRcmdr(dataFrame, text="  "), sticky = "nw")
   tkgrid(getFrame(responseBox), labelRcmdr(dataFrame, text=" "), sticky = "nw")
-  tkgrid(labelRcmdr(methodFrame, text = gettextRcmdr("Method
-(input : hsd / lsd / bonferroni / scheffe / newmankeuls / duncan)"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(methodFrame, text = gettextRcmdr("방법
+(입력 : hsd / lsd / bonferroni / scheffe / newmankeuls / duncan)"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
   tkgrid(methodField, sticky="w")
   tkgrid(methodFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
   tkgrid(dataFrame, sticky="nw")
@@ -514,7 +464,7 @@ usermeandiff <- function () {
 meandiff <- function () {
   defaults <- list(initial.group = NULL,initial.response = NULL,initial.method="hsd")
   dialog.values <- getDialog("meandiff", defaults)
-  initializeDialog(title = gettextRcmdr("Population Mean Difference : All Factor and Interaction"), use.tabs = FALSE)
+  initializeDialog(title = gettextRcmdr("모평균차 : 모든 요인 및 교호작용"), use.tabs = FALSE)
   dataFrame <- tkframe(top)
   groupBox <- variableListBox(dataFrame, selectmode = "multiple",
                               title = gettextRcmdr("Factors (pick one or more)"),
@@ -550,8 +500,8 @@ meandiff <- function () {
 
   tkgrid(getFrame(groupBox), labelRcmdr(dataFrame, text="  "), sticky = "nw")
   tkgrid(getFrame(responseBox), labelRcmdr(dataFrame, text=" "), sticky = "nw")
-  tkgrid(labelRcmdr(methodFrame, text = gettextRcmdr("Method
-(input : hsd / lsd / bonferroni / scheffe / newmankeuls / duncan)"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(methodFrame, text = gettextRcmdr("방법
+(입력 : hsd / lsd / bonferroni / scheffe / newmankeuls / duncan)"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
   tkgrid(methodField, sticky="w")
   tkgrid(methodFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
   tkgrid(dataFrame, sticky="nw")
@@ -562,7 +512,7 @@ meandiff <- function () {
 facrandomtable <- function () {
   defaults <- list(initial.level = "c(3,3,2)", initial.nvars = "3", initial.repet="2", initial.std="FALSE")
   dialog.values <- getDialog("facrandomtable", defaults)
-  initializeDialog(title = gettextRcmdr("Random Number Table of Factorial Design"), use.tabs = FALSE)
+  initializeDialog(title = gettextRcmdr("요인배치법 난수표"), use.tabs = FALSE)
   mainFrame <- tkframe(top)
   UpdateModelNumber()
   modelName <- tclVar(paste("AnovaModel.", getRcmdr("modelNumber"),
@@ -611,10 +561,10 @@ facrandomtable <- function () {
   tkgrid(labelRcmdr(modelFrame, text = gettextRcmdr("Enter name for model: ")),
          model, sticky = "w")
   tkgrid(modelFrame, sticky = "w")
-  tkgrid(labelRcmdr(levelFrame, text = gettextRcmdr("Each Factor's level / c(level1,level2,...)"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
-  tkgrid(labelRcmdr(nvarsFrame, text = gettextRcmdr("Number of Factors"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
-  tkgrid(labelRcmdr(repetFrame, text = gettextRcmdr("Repeat"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
-  tkgrid(labelRcmdr(stdFrame, text = gettextRcmdr("Std / TRUE : standard order or FALSE : run order"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(levelFrame, text = gettextRcmdr("각 요인의 수준 / c(A인자 수준,B인자 수준,...)"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(nvarsFrame, text = gettextRcmdr("요인의 수"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(repetFrame, text = gettextRcmdr("반복수"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(stdFrame, text = gettextRcmdr("표준순서 / TRUE : 표준순서 or FALSE : 실행 순서"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
   tkgrid(levelField, sticky="w")
   tkgrid(nvarsField, sticky="w")
   tkgrid(repetField, sticky="w")
@@ -631,7 +581,7 @@ facrandomtable <- function () {
 boxbenken <- function () {
   defaults <- list(initial.kfactor = "3", initial.center = 4, initial.random="TRUE")
   dialog.values <- getDialog("boxbenken", defaults)
-  initializeDialog(title = gettextRcmdr("Design of Box Benken"), use.tabs = FALSE)
+  initializeDialog(title = gettextRcmdr("Box-Benken 설계"), use.tabs = FALSE)
   mainFrame <- tkframe(top)
   UpdateModelNumber()
   modelName <- tclVar(paste("AnovaModel.", getRcmdr("modelNumber"),
@@ -674,9 +624,9 @@ boxbenken <- function () {
   tkgrid(labelRcmdr(modelFrame, text = gettextRcmdr("Enter name for model: ")),
          model, sticky = "w")
   tkgrid(modelFrame, sticky = "w")
-  tkgrid(labelRcmdr(kfactorFrame, text = gettextRcmdr("Number of Factors"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
-  tkgrid(labelRcmdr(centerFrame, text = gettextRcmdr("Number of center point"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
-  tkgrid(labelRcmdr(randomFrame, text = gettextRcmdr("Randomize / TRUE or FALSE"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(kfactorFrame, text = gettextRcmdr("요인의 수"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(centerFrame, text = gettextRcmdr("중심점의 수"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(randomFrame, text = gettextRcmdr("랜덤화 / TRUE or FALSE"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
   tkgrid(kfactorField, sticky="w")
   tkgrid(centerField, sticky="w")
   tkgrid(randomField, sticky="w")
@@ -691,7 +641,7 @@ boxbenken <- function () {
 central <- function () {
   defaults <- list(initial.basis = "3", initial.center = "4", initial.wbreps="1", initial.bbreps="1", initial.random="TRUE", initial.oneblock="FALSE")
   dialog.values <- getDialog("central", defaults)
-  initializeDialog(title = gettextRcmdr("Design of Central Composite"), use.tabs = FALSE)
+  initializeDialog(title = gettextRcmdr("중심합성계획"), use.tabs = FALSE)
   mainFrame <- tkframe(top)
   UpdateModelNumber()
   modelName <- tclVar(paste("AnovaModel.", getRcmdr("modelNumber"),
@@ -750,12 +700,12 @@ central <- function () {
   tkgrid(labelRcmdr(modelFrame, text = gettextRcmdr("Enter name for model: ")),
          model, sticky = "w")
   tkgrid(modelFrame, sticky = "w")
-  tkgrid(labelRcmdr(basisFrame, text = gettextRcmdr("Number of Factors"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
-  tkgrid(labelRcmdr(centerFrame, text = gettextRcmdr("Number of Center Point"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
-  tkgrid(labelRcmdr(wbrepsFrame, text = gettextRcmdr("Number of Within Block Replication"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
-  tkgrid(labelRcmdr(bbrepsFrame, text = gettextRcmdr("Number of Between Block Replication"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
-  tkgrid(labelRcmdr(randomFrame, text = gettextRcmdr("Randomize / TRUE or FALSE"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
-  tkgrid(labelRcmdr(oneblockFrame, text = gettextRcmdr("Oneblock / TRUE or FALSE"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(basisFrame, text = gettextRcmdr("요인의 수"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(centerFrame, text = gettextRcmdr("중심점의 수"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(wbrepsFrame, text = gettextRcmdr("블록 내 반복의 수"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(bbrepsFrame, text = gettextRcmdr("블록 간 반복의 수"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(randomFrame, text = gettextRcmdr("랜덤화 / TRUE or FALSE"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(oneblockFrame, text = gettextRcmdr("블록이 하나인가?/ TRUE or FALSE"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
   tkgrid(basisField, sticky="w")
   tkgrid(centerField, sticky="w")
   tkgrid(wbrepsField, sticky="w")
@@ -776,7 +726,7 @@ central <- function () {
 designsplit <- function () {
   defaults <- list(initial.factor1 = "c(1,2,3)", initial.factor2 = "c(1,2,3)", initial.repet="1", initial.seed="0", initial.random="TRUE", initial.std="FALSE")
   dialog.values <- getDialog("designsplit", defaults)
-  initializeDialog(title = gettextRcmdr("Random Number Table of Split Method"), use.tabs = FALSE)
+  initializeDialog(title = gettextRcmdr("분할법 난수표"), use.tabs = FALSE)
   mainFrame <- tkframe(top)
   UpdateModelNumber()
   modelName <- tclVar(paste("AnovaModel.", getRcmdr("modelNumber"),
@@ -835,12 +785,12 @@ designsplit <- function () {
   tkgrid(labelRcmdr(modelFrame, text = gettextRcmdr("Enter name for model: ")),
          model, sticky = "w")
   tkgrid(modelFrame, sticky = "w")
-  tkgrid(labelRcmdr(factor1Frame, text = gettextRcmdr("Level of Factor1"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
-  tkgrid(labelRcmdr(factor2Frame, text = gettextRcmdr("Level of Factor2"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
-  tkgrid(labelRcmdr(repetFrame, text = gettextRcmdr("Repeat"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(factor1Frame, text = gettextRcmdr("요인1의 수준"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(factor2Frame, text = gettextRcmdr("요인2의 수준"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(repetFrame, text = gettextRcmdr("반복수"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
   tkgrid(labelRcmdr(seedFrame, text = gettextRcmdr("Seed"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
-  tkgrid(labelRcmdr(randomFrame, text = gettextRcmdr("Randomize / TRUE or FALSE"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
-  tkgrid(labelRcmdr(stdFrame, text = gettextRcmdr("Standard Order / TRUE or FALSE"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(randomFrame, text = gettextRcmdr("랜덤화 / TRUE or FALSE"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(stdFrame, text = gettextRcmdr("표준순서 / TRUE : 표준순서 or FALSE : 실행 순서"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
   tkgrid(factor1Field, sticky="w")
   tkgrid(factor2Field, sticky="w")
   tkgrid(repetField, sticky="w")
@@ -861,7 +811,7 @@ designsplit <- function () {
 qualaov <- function () {
   defaults <- list(initial.group = NULL,initial.response = NULL,initial.repet="1",initial.row = "1", initial.column="1", initial.fac="1")
   dialog.values <- getDialog("qualaov", defaults)
-  initializeDialog(title = gettextRcmdr("ANOVA of Qualitative Data"), use.tabs = FALSE)
+  initializeDialog(title = gettextRcmdr("계수치 분산분석"), use.tabs = FALSE)
   dataFrame <- tkframe(top)
   groupBox <- variableListBox(dataFrame, selectmode = "multiple",
                               title = gettextRcmdr("Factors (pick one or more)"),
@@ -914,10 +864,10 @@ qualaov <- function () {
 
   tkgrid(getFrame(groupBox), labelRcmdr(dataFrame, text="  "), sticky = "nw")
   tkgrid(getFrame(responseBox), labelRcmdr(dataFrame, text=" "), sticky = "nw")
-  tkgrid(labelRcmdr(repetFrame, text = gettextRcmdr("Repeat"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
-  tkgrid(labelRcmdr(rowFrame, text = gettextRcmdr("Number of Row"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
-  tkgrid(labelRcmdr(columnFrame, text = gettextRcmdr("Number of Column"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
-  tkgrid(labelRcmdr(facFrame, text = gettextRcmdr("1 : One way / 2 : Two way"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(repetFrame, text = gettextRcmdr("반복수"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(rowFrame, text = gettextRcmdr("행의 수"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(columnFrame, text = gettextRcmdr("열의 수"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(facFrame, text = gettextRcmdr("1 : 일원배치 / 2 : 이원배치"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
   tkgrid(repetField, sticky="w")
   tkgrid(rowField, sticky="w")
   tkgrid(columnField, sticky="w")
