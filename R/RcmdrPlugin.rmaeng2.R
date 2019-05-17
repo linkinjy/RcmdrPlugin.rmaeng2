@@ -99,8 +99,14 @@ onerandomtable <- function () {
   dialog.values <- getDialog("onerandomtable", defaults)
   initializeDialog(title = gettextRcmdr("Random Number Table of One Way"), use.tabs = FALSE)
   mainFrame <- tkframe(top)
+  UpdateModelNumber()
+  modelName <- tclVar(paste("AnovaModel.", getRcmdr("modelNumber"),
+                            sep = ""))
+  modelFrame <- tkframe(top)
+  model <- ttkentry(modelFrame, width = "20", textvariable = modelName)
 
   onOK <- function() {
+    modelValue <- trim.blanks(tclvalue(modelName))
 
     fac<-as.character(tclvalue(factorname))
     repet<-tclvalue(repetition)
@@ -111,6 +117,9 @@ onerandomtable <- function () {
     closeDialog()
 
     doItAndPrint(paste("random.one(", "fac=", fac,",", "r=", repet,",", "seed=", sed,",", "std=", sttd, ")", sep = ""))
+    justDoIt(paste(modelValue, "<-random.one(","fac=", fac,",", "r=", repet,",", "seed=", sed,",", "std=", sttd, ")", sep = ""))
+    activeModel(modelValue)
+
     tkfocus(CommanderWindow())
   }
 
@@ -134,8 +143,11 @@ onerandomtable <- function () {
 
   tkgrid(labelRcmdr(mainFrame, text="  "), sticky = "nw")
   tkgrid(mainFrame, sticky="nw")
+  tkgrid(labelRcmdr(modelFrame, text = gettextRcmdr("Enter name for model: ")),
+         model, sticky = "w")
+  tkgrid(modelFrame, sticky = "w")
   tkgrid(labelRcmdr(factorFrame, text = gettextRcmdr("Factor/input factor's name in quotation"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
-  tkgrid(labelRcmdr(repetFrame, text = gettextRcmdr("Repeat"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(repetFrame, text = gettextRcmdr("Repet"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
   tkgrid(labelRcmdr(seedFrame, text = gettextRcmdr("Seed"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
   tkgrid(labelRcmdr(stdFrame, text = gettextRcmdr("Std/TRUE or FALSE"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
   tkgrid(factorField, sticky="w")
@@ -150,13 +162,20 @@ onerandomtable <- function () {
   dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
 }
 
+
 latinrandomtable <- function () {
   defaults <- list(initial.factornumber = "3", initial.greco = "FALSE", initial.seed="0", initial.std="FALSE")
   dialog.values <- getDialog("latinrandomtable", defaults)
   initializeDialog(title = gettextRcmdr("Random Number Table of Latin Square"), use.tabs = FALSE)
   mainFrame <- tkframe(top)
+  UpdateModelNumber()
+  modelName <- tclVar(paste("AnovaModel.", getRcmdr("modelNumber"),
+                            sep = ""))
+  modelFrame <- tkframe(top)
+  model <- ttkentry(modelFrame, width = "20", textvariable = modelName)
 
   onOK <- function() {
+    modelValue <- trim.blanks(tclvalue(modelName))
 
     n<-tclvalue(factornumber)
     greco<-as.character(tclvalue(greco))
@@ -167,6 +186,9 @@ latinrandomtable <- function () {
     closeDialog()
 
     doItAndPrint(paste("random.latin(", "n=", n,",", "greco=", greco,",", "seed=", sed,",", "std=", sttd, ")", sep = ""))
+    justDoIt(paste(modelValue, "<-random.latin(", "n=", n,",", "greco=", greco,",", "seed=", sed,",", "std=", sttd, ")", sep = ""))
+    activeModel(modelValue)
+
     tkfocus(CommanderWindow())
   }
 
@@ -190,6 +212,9 @@ latinrandomtable <- function () {
 
   tkgrid(labelRcmdr(mainFrame, text="  "), sticky = "nw")
   tkgrid(mainFrame, sticky="nw")
+  tkgrid(labelRcmdr(modelFrame, text = gettextRcmdr("Enter name for model: ")),
+         model, sticky = "w")
+  tkgrid(modelFrame, sticky = "w")
   tkgrid(labelRcmdr(factorFrame, text = gettextRcmdr("Number of Factor / N*N latin square"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
   tkgrid(labelRcmdr(grecoFrame, text = gettextRcmdr("Latin or Greco / TRUE = Greco, FALSE = Latin"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
   tkgrid(labelRcmdr(seedFrame, text = gettextRcmdr("Seed"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
@@ -206,13 +231,20 @@ latinrandomtable <- function () {
   dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
 }
 
+
 multirandomtable <- function () {
   defaults <- list(initial.factornumber = "c(2,3)", initial.repetition = "", initial.seed="0", initial.std="FALSE")
   dialog.values <- getDialog("multirandomtable", defaults)
   initializeDialog(title = gettextRcmdr("Random Number Table of Multi Way"), use.tabs = FALSE)
   mainFrame <- tkframe(top)
+  UpdateModelNumber()
+  modelName <- tclVar(paste("AnovaModel.", getRcmdr("modelNumber"),
+                            sep = ""))
+  modelFrame <- tkframe(top)
+  model <- ttkentry(modelFrame, width = "20", textvariable = modelName)
 
   onOK <- function() {
+    modelValue <- trim.blanks(tclvalue(modelName))
 
     fac<-as.character(tclvalue(factornumber))
     repet<-tclvalue(repetition)
@@ -223,6 +255,8 @@ multirandomtable <- function () {
     closeDialog()
 
     doItAndPrint(paste("random.multi(", "fac=", fac,",", "r=", repet,",", "seed=", sed,",", "std=", sttd, ")", sep = ""))
+    justDoIt(paste(modelValue, "<-random.multi(", "fac=", fac,",", "r=", repet,",", "seed=", sed,",", "std=", sttd, ")", sep = ""))
+    activeModel(modelValue)
     tkfocus(CommanderWindow())
   }
 
@@ -246,8 +280,11 @@ multirandomtable <- function () {
 
   tkgrid(labelRcmdr(mainFrame, text="  "), sticky = "nw")
   tkgrid(mainFrame, sticky="nw")
+  tkgrid(labelRcmdr(modelFrame, text = gettextRcmdr("Enter name for model: ")),
+         model, sticky = "w")
+  tkgrid(modelFrame, sticky = "w")
   tkgrid(labelRcmdr(factorFrame, text = gettextRcmdr("Factor/input Each factor's Level"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
-  tkgrid(labelRcmdr(repetFrame, text = gettextRcmdr("Repeat"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(repetFrame, text = gettextRcmdr("Repet"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
   tkgrid(labelRcmdr(seedFrame, text = gettextRcmdr("Seed"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
   tkgrid(labelRcmdr(stdFrame, text = gettextRcmdr("Std/TRUE or FALSE"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
   tkgrid(factorField, sticky="w")
@@ -261,6 +298,7 @@ multirandomtable <- function () {
   tkgrid(buttonsFrame, sticky = "w")
   dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
 }
+
 
 mainplot <- function () {
   defaults <- list(initial.group = NULL,initial.response = NULL)
@@ -526,8 +564,15 @@ facrandomtable <- function () {
   dialog.values <- getDialog("facrandomtable", defaults)
   initializeDialog(title = gettextRcmdr("Random Number Table of Factorial Design"), use.tabs = FALSE)
   mainFrame <- tkframe(top)
+  UpdateModelNumber()
+  modelName <- tclVar(paste("AnovaModel.", getRcmdr("modelNumber"),
+                            sep = ""))
+  modelFrame <- tkframe(top)
+  model <- ttkentry(modelFrame, width = "20", textvariable = modelName)
 
   onOK <- function() {
+    modelValue <- trim.blanks(tclvalue(modelName))
+
 
     levell<-as.character(tclvalue(level))
     nvar<-tclvalue(nvars)
@@ -538,6 +583,8 @@ facrandomtable <- function () {
     closeDialog()
 
     doItAndPrint(paste("fac.design(", "levels=", levell,",", "nVars=", nvar,",", "r=", repe,",","std=", sttd, ")", sep = ""))
+    justDoIt(paste(modelValue, "<-fac.design(", "levels=", levell,",", "nVars=", nvar,",", "r=", repe,",","std=", sttd, ")", sep = ""))
+    activeModel(modelValue)
     tkfocus(CommanderWindow())
   }
 
@@ -561,6 +608,9 @@ facrandomtable <- function () {
 
   tkgrid(labelRcmdr(mainFrame, text="  "), sticky = "nw")
   tkgrid(mainFrame, sticky="nw")
+  tkgrid(labelRcmdr(modelFrame, text = gettextRcmdr("Enter name for model: ")),
+         model, sticky = "w")
+  tkgrid(modelFrame, sticky = "w")
   tkgrid(labelRcmdr(levelFrame, text = gettextRcmdr("Each Factor's level / c(level1,level2,...)"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
   tkgrid(labelRcmdr(nvarsFrame, text = gettextRcmdr("Number of Factors"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
   tkgrid(labelRcmdr(repetFrame, text = gettextRcmdr("Repeat"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
@@ -577,13 +627,20 @@ facrandomtable <- function () {
   dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
 }
 
+
 boxbenken <- function () {
   defaults <- list(initial.kfactor = "3", initial.center = 4, initial.random="TRUE")
   dialog.values <- getDialog("boxbenken", defaults)
   initializeDialog(title = gettextRcmdr("Design of Box Benken"), use.tabs = FALSE)
   mainFrame <- tkframe(top)
+  UpdateModelNumber()
+  modelName <- tclVar(paste("AnovaModel.", getRcmdr("modelNumber"),
+                            sep = ""))
+  modelFrame <- tkframe(top)
+  model <- ttkentry(modelFrame, width = "20", textvariable = modelName)
 
   onOK <- function() {
+    modelValue <- trim.blanks(tclvalue(modelName))
 
     kfactors<-tclvalue(kfactor)
     centers<-tclvalue(center)
@@ -593,6 +650,8 @@ boxbenken <- function () {
     closeDialog()
 
     doItAndPrint(paste("kbbd(", "k=", kfactors,",", "n0=", centers,",","randomize=", randoms, ")", sep = ""))
+    justDoIt(paste(modelValue, "<-kbbd(", "k=", kfactors,",", "n0=", centers,",","randomize=", randoms, ")", sep = ""))
+    activeModel(modelValue)
     tkfocus(CommanderWindow())
   }
 
@@ -612,6 +671,9 @@ boxbenken <- function () {
 
   tkgrid(labelRcmdr(mainFrame, text="  "), sticky = "nw")
   tkgrid(mainFrame, sticky="nw")
+  tkgrid(labelRcmdr(modelFrame, text = gettextRcmdr("Enter name for model: ")),
+         model, sticky = "w")
+  tkgrid(modelFrame, sticky = "w")
   tkgrid(labelRcmdr(kfactorFrame, text = gettextRcmdr("Number of Factors"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
   tkgrid(labelRcmdr(centerFrame, text = gettextRcmdr("Number of center point"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
   tkgrid(labelRcmdr(randomFrame, text = gettextRcmdr("Randomize / TRUE or FALSE"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
@@ -625,13 +687,20 @@ boxbenken <- function () {
   dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
 }
 
+
 central <- function () {
   defaults <- list(initial.basis = "3", initial.center = "4", initial.wbreps="1", initial.bbreps="1", initial.random="TRUE", initial.oneblock="FALSE")
   dialog.values <- getDialog("central", defaults)
   initializeDialog(title = gettextRcmdr("Design of Central Composite"), use.tabs = FALSE)
   mainFrame <- tkframe(top)
+  UpdateModelNumber()
+  modelName <- tclVar(paste("AnovaModel.", getRcmdr("modelNumber"),
+                            sep = ""))
+  modelFrame <- tkframe(top)
+  model <- ttkentry(modelFrame, width = "20", textvariable = modelName)
 
   onOK <- function() {
+    modelValue <- trim.blanks(tclvalue(modelName))
 
     basiss<-tclvalue(basis)
     centers<-tclvalue(center)
@@ -644,6 +713,8 @@ central <- function () {
     closeDialog()
 
     doItAndPrint(paste("kccd(", "basis=", basiss,",", "n0=", centers,",","wbreps=",wbrep,",","bbreps=",bbrep,",","randomize=", randoms,"," ,"oneblock=",oneblocks,")", sep = ""))
+    justDoIt(paste(modelValue, "<-kccd(", "basis=", basiss,",", "n0=", centers,",","wbreps=",wbrep,",","bbreps=",bbrep,",","randomize=", randoms,"," ,"oneblock=",oneblocks,")", sep = ""))
+    activeModel(modelValue)
     tkfocus(CommanderWindow())
   }
 
@@ -676,6 +747,9 @@ central <- function () {
 
   tkgrid(labelRcmdr(mainFrame, text="  "), sticky = "nw")
   tkgrid(mainFrame, sticky="nw")
+  tkgrid(labelRcmdr(modelFrame, text = gettextRcmdr("Enter name for model: ")),
+         model, sticky = "w")
+  tkgrid(modelFrame, sticky = "w")
   tkgrid(labelRcmdr(basisFrame, text = gettextRcmdr("Number of Factors"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
   tkgrid(labelRcmdr(centerFrame, text = gettextRcmdr("Number of Center Point"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
   tkgrid(labelRcmdr(wbrepsFrame, text = gettextRcmdr("Number of Within Block Replication"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
@@ -698,13 +772,20 @@ central <- function () {
   dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
 }
 
+
 designsplit <- function () {
   defaults <- list(initial.factor1 = "c(1,2,3)", initial.factor2 = "c(1,2,3)", initial.repet="1", initial.seed="0", initial.random="TRUE", initial.std="FALSE")
   dialog.values <- getDialog("designsplit", defaults)
   initializeDialog(title = gettextRcmdr("Random Number Table of Split Method"), use.tabs = FALSE)
   mainFrame <- tkframe(top)
+  UpdateModelNumber()
+  modelName <- tclVar(paste("AnovaModel.", getRcmdr("modelNumber"),
+                            sep = ""))
+  modelFrame <- tkframe(top)
+  model <- ttkentry(modelFrame, width = "20", textvariable = modelName)
 
   onOK <- function() {
+    modelValue <- trim.blanks(tclvalue(modelName))
 
     factor11<-as.character(tclvalue(factor1))
     factor22<-as.character(tclvalue(factor2))
@@ -717,6 +798,8 @@ designsplit <- function () {
     closeDialog()
 
     doItAndPrint(paste("design.split(", factor11,",", factor22,",","r=",repe,",","seed=",sed,",","randomization=", randoms,"," ,"std=",sttd,")", sep = ""))
+    justDoIt(paste(modelValue, "<-design.split(", factor11,",", factor22,",","r=",repe,",","seed=",sed,",","randomization=", randoms,"," ,"std=",sttd,")", sep = ""))
+    activeModel(modelValue)
     tkfocus(CommanderWindow())
   }
 
@@ -749,6 +832,9 @@ designsplit <- function () {
 
   tkgrid(labelRcmdr(mainFrame, text="  "), sticky = "nw")
   tkgrid(mainFrame, sticky="nw")
+  tkgrid(labelRcmdr(modelFrame, text = gettextRcmdr("Enter name for model: ")),
+         model, sticky = "w")
+  tkgrid(modelFrame, sticky = "w")
   tkgrid(labelRcmdr(factor1Frame, text = gettextRcmdr("Level of Factor1"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
   tkgrid(labelRcmdr(factor2Frame, text = gettextRcmdr("Level of Factor2"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
   tkgrid(labelRcmdr(repetFrame, text = gettextRcmdr("Repeat"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
@@ -770,6 +856,7 @@ designsplit <- function () {
   tkgrid(buttonsFrame, sticky = "w")
   dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
 }
+
 
 qualaov <- function () {
   defaults <- list(initial.group = NULL,initial.response = NULL,initial.repet="1",initial.row = "1", initial.column="1", initial.fac="1")
