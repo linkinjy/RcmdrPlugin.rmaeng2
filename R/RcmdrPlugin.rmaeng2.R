@@ -371,7 +371,7 @@ oneerror <- function () {
   groupBox <- variableListBox(dataFrame, selectmode = "single",
                               title = gettextRcmdr("요인 (하나 선택)"),
                               initialSelection = varPosn(dialog.values$initial.group, "all"))
-  responseBox <- variableListBox(dataFrame, title = gettextRcmdr("Response Variable (pick one)"),
+  responseBox <- variableListBox(dataFrame, title = gettextRcmdr("반응변수 (하나 선택)"),
                                  initialSelection = varPosn(dialog.values$initial.response, "all"))
 
   onOK <- function() {
@@ -418,9 +418,9 @@ usermeandiff <- function () {
   initializeDialog(title = gettextRcmdr("모평균차 : 요인 및 교호작용 (사용자 설정)"), use.tabs = FALSE)
   dataFrame <- tkframe(top)
   groupBox <- variableListBox(dataFrame, selectmode = "multiple",
-                              title = gettextRcmdr("Factors (pick one or more)"),
+                              title = gettextRcmdr("요인 (하나 이상 선택)"),
                               initialSelection = varPosn(dialog.values$initial.group, "all"))
-  responseBox <- variableListBox(dataFrame, title = gettextRcmdr("Response Variable (pick one)"),
+  responseBox <- variableListBox(dataFrame, title = gettextRcmdr("반응변수 (하나 선택)"),
                                  initialSelection = varPosn(dialog.values$initial.response, "all"))
 
   onOK <- function() {
@@ -439,7 +439,7 @@ usermeandiff <- function () {
     closeDialog()
 
     .activeDataSet <- ActiveDataSet()
-    groups.list <- paste(paste(rep(ActiveDataSet()),rep('$'),groups, sep = ""), collapse = ",")
+    groups.list <- paste(paste(rep("factor"),rep("("),rep(ActiveDataSet()),rep('$'),groups, rep(")"),sep = ""), collapse = "+")
     doItAndPrint(paste("mean.diff(", .activeDataSet,"$",response,"~",groups.list,",","method=",'"',methodd,'"',")", sep = ""))
     tkfocus(CommanderWindow())
   }
@@ -488,7 +488,7 @@ meandiff <- function () {
     closeDialog()
 
     .activeDataSet <- ActiveDataSet()
-    groups.list <- paste(paste(rep(ActiveDataSet()),rep('$'),groups, sep = ""), collapse = ",")
+    groups.list <- paste(paste(rep("factor"),rep("("),rep(ActiveDataSet()),rep('$'),groups, rep(")"),sep = ""), collapse = "*")
     doItAndPrint(paste("mean.diff(", .activeDataSet,"$",response,"~",groups.list,",","method=",'"',methodd,'"',")", sep = ""))
     tkfocus(CommanderWindow())
   }
