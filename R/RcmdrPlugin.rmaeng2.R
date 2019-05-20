@@ -25,7 +25,7 @@ aanova <- function () {
 
     .activeDataSet <- ActiveDataSet()
     groups.list <- paste(paste(groups, sep = ""), collapse = ", ")
-    doItAndPrint(paste("aov.t(", response,"~", formull, ")", sep = ""))
+    doItAndPrint(paste("aov(", response,"~", formull,",data=",.activeDataSet,")", sep = ""))
     tkfocus(CommanderWindow())
   }
 
