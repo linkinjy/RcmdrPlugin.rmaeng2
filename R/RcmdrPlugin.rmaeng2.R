@@ -271,8 +271,7 @@ mainplot <- function () {
     closeDialog()
 
     .activeDataSet <- ActiveDataSet()
-    groups.list <- paste(paste(groups, sep = ""), collapse = ", ")
-    doItAndPrint(paste("main.effect(", .activeDataSet,',',groups,',',response, ")"))
+    doItAndPrint(paste("main.effect(", .activeDataSet,',',.activeDataSet,"$",groups,',',.activeDataSet,"$",response, ")"))
     tkfocus(CommanderWindow())
   }
 
@@ -290,11 +289,11 @@ interactionplot <- function () {
   dialog.values <- getDialog("interactionplot", defaults)
   initializeDialog(title = gettextRcmdr("교호작용도"), use.tabs = FALSE)
   dataFrame <- tkframe(top)
-  groupBox <- variableListBox(dataFrame, Factors(), selectmode = "multiple",
+  groupBox <- variableListBox(dataFrame, selectmode = "multiple",
                               title = gettextRcmdr("요인 (두개 선택)"),
-                              initialSelection = varPosn(dialog.values$initial.group, "factor"))
-  responseBox <- variableListBox(dataFrame, Numeric(), title = gettextRcmdr("Response Variable (pick one)"),
-                                 initialSelection = varPosn(dialog.values$initial.response, "numeric"))
+                              initialSelection = varPosn(dialog.values$initial.group, "all"))
+  responseBox <- variableListBox(dataFrame, title = gettextRcmdr("Response Variable (pick one)"),
+                                 initialSelection = varPosn(dialog.values$initial.response, "all"))
 
   onOK <- function() {
     groups <- getSelection(groupBox)
@@ -312,8 +311,8 @@ interactionplot <- function () {
     closeDialog()
 
     .activeDataSet <- ActiveDataSet()
-    groups.list <- paste(paste(groups, sep = ""), collapse = ", ")
-    doItAndPrint(paste("interaction.effect(", .activeDataSet,',',groups.list,',',response, ")"))
+    groups.list <- paste(paste(rep(ActiveDataSet()),rep('$'),groups, sep = ""), collapse = ",")
+    doItAndPrint(paste("interaction.effect(", .activeDataSet,',',groups.list,',',.activeDataSet,"$",response, ")"))
     tkfocus(CommanderWindow())
   }
 
@@ -350,8 +349,8 @@ sscatterplot <- function () {
     closeDialog()
 
     .activeDataSet <- ActiveDataSet()
-    groups.list <- paste(paste(groups, sep = ""), collapse = ", ")
-    doItAndPrint(paste("scatter.plot(", .activeDataSet,",",groups.list,",",response, ")"))
+    groups.list <- paste(paste(rep(ActiveDataSet()),rep('$'),groups, sep = ""), collapse = ",")
+    doItAndPrint(paste("scatter.plot(", .activeDataSet,",",groups.list,",",.activeDataSet,"$",response, ")"))
     tkfocus(CommanderWindow())
   }
 
@@ -393,7 +392,7 @@ oneerror <- function () {
 
     .activeDataSet <- ActiveDataSet()
     groups.list <- paste(paste(groups, sep = ""), collapse = ", ")
-    doItAndPrint(paste("error.var(", response,"~",groups.list,",",.activeDataSet,",",al, ")", sep = ""))
+    doItAndPrint(paste("error.var(", .activeDataSet,"$",response,"~",.activeDataSet,"$",groups,",",.activeDataSet,",",al, ")", sep = ""))
     tkfocus(CommanderWindow())
   }
 
@@ -439,8 +438,9 @@ usermeandiff <- function () {
     putDialog ("usermeandiff", list (initial.group = groups, initial.response = response, initial.method = methodd))
     closeDialog()
 
-    groups.list <- paste(paste(groups, sep = ""), collapse = "+")
-    doItAndPrint(paste("mean.diff(", response,"~",groups.list,",","method=",'"',methodd,'"',")", sep = ""))
+    .activeDataSet <- ActiveDataSet()
+    groups.list <- paste(paste(rep(ActiveDataSet()),rep('$'),groups, sep = ""), collapse = ",")
+    doItAndPrint(paste("mean.diff(", .activeDataSet,"$",response,"~",groups.list,",","method=",'"',methodd,'"',")", sep = ""))
     tkfocus(CommanderWindow())
   }
 
@@ -487,8 +487,9 @@ meandiff <- function () {
     putDialog ("meandiff", list (initial.group = groups, initial.response = response, initial.method = methodd))
     closeDialog()
 
-    groups.list <- paste(paste(groups, sep = ""), collapse = "*")
-    doItAndPrint(paste("mean.diff(", response,"~",groups.list,",","method=",'"',methodd,'"',")", sep = ""))
+    .activeDataSet <- ActiveDataSet()
+    groups.list <- paste(paste(rep(ActiveDataSet()),rep('$'),groups, sep = ""), collapse = ",")
+    doItAndPrint(paste("mean.diff(", .activeDataSet,"$",response,"~",groups.list,",","method=",'"',methodd,'"',")", sep = ""))
     tkfocus(CommanderWindow())
   }
 
