@@ -1111,3 +1111,117 @@ steep <- function () {
   tkgrid(buttonsFrame, sticky = "w")
   dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
 }
+
+rsmanova <- function () {
+  defaults <- list(initial.response = "", initial.fac1 = "", initial.fac2 = "", initial.fac3 = "", initial.fac4 = "",
+                   initial.for1 = "", initial.for2 = "", initial.for3 = " ", initial.for4 = "")
+  dialog.values <- getDialog("rsmanova", defaults)
+  initializeDialog(title = gettextRcmdr("반응표면 분산분석"))
+  dataFrame <- tkframe(top)
+
+  onOK <- function() {
+    responses <- as.character(tclvalue(response))
+    fac11 <- as.character(tclvalue(fac1))
+    fac22 <- as.character(tclvalue(fac2))
+    fac33 <- as.character(tclvalue(fac3))
+    fac44 <- as.character(tclvalue(fac4))
+    for11 <- as.character(tclvalue(for1))
+    for22 <- as.character(tclvalue(for2))
+    for33 <- as.character(tclvalue(for3))
+    for44 <- as.character(tclvalue(for4))
+
+    putDialog ("rsmanova", list (initial.response = responses, initial.fac1 = fac11,initial.fac2 = fac22,initial.fac3 = fac33,initial.fac4 = fac44,
+                                 initial.for1 = for11, initial.for2 = for22, initial.for3 = for33, initial.for4 = for44))
+    closeDialog()
+
+    .activeDataSet <- ActiveDataSet()
+    if (fac11!="" & fac22=="" & fac33=="" & fac44==""){
+      doItAndPrint(paste("kk<-coded.data(", .activeDataSet,",x1~",for11,")", sep = ""))
+      doItAndPrint(paste("ho<-rsm(","kk$",responses,"~SO(x1)",",data=kk)", sep = ""))
+    }
+    if (fac11!=""&fac22!=""&fac33=="" & fac44==""){
+      doItAndPrint(paste("kk<-coded.data(", .activeDataSet,",x1~",for11,",x2~",for22,")", sep = ""))
+      doItAndPrint(paste("ho<-rsm(","kk$",responses,"~SO(x1,x2)",",data=kk)", sep = ""))
+    }
+    if (fac11!=""&fac22!=""&fac33!=""&fac44==""){
+      doItAndPrint(paste("kk<-coded.data(", .activeDataSet,",x1~",for11,",x2~",for22,",x3~",for33, ")", sep = ""))
+      doItAndPrint(paste("ho<-rsm(","kk$",responses,"~SO(x1,x2,x3)",",data=kk)", sep = ""))
+    }
+    if (fac11!=""&fac22!=""&fac33!=""&fac44!=""){
+      doItAndPrint(paste("kk<-coded.data(", .activeDataSet,",x1~",for11,",x2~",for22,",x3~",for33,",x4~",for44, ")", sep = ""))
+      doItAndPrint(paste("ho<-rsm(","kk$",responses,"~SO(x1,x2,x3,x4)",",data=kk)", sep = ""))
+      tkfocus(CommanderWindow())
+    }
+    doItAndPrint(paste("summary(ho)", sep = ""))
+  }
+
+  OKCancelHelp(helpSubject = "Anova", model = TRUE, reset = "rsmanova", apply = "rsmanova")
+
+
+  responseFrame <- tkframe(dataFrame)
+  response <- tclVar(dialog.values$initial.response)
+  responseField <- ttkentry(responseFrame, width = "20", textvariable = response)
+
+  fac1Frame <- tkframe(dataFrame)
+  fac1 <- tclVar(dialog.values$initial.fac1)
+  fac1Field <- ttkentry(fac1Frame, width = "20", textvariable = fac1)
+
+  fac2Frame <- tkframe(dataFrame)
+  fac2 <- tclVar(dialog.values$initial.fac2)
+  fac2Field <- ttkentry(fac2Frame, width = "20", textvariable = fac2)
+
+  fac3Frame <- tkframe(dataFrame)
+  fac3 <- tclVar(dialog.values$initial.fac3)
+  fac3Field <- ttkentry(fac3Frame, width = "20", textvariable = fac3)
+
+  fac4Frame <- tkframe(dataFrame)
+  fac4 <- tclVar(dialog.values$initial.fac4)
+  fac4Field <- ttkentry(fac4Frame, width = "20", textvariable = fac4)
+
+  for1Frame <- tkframe(dataFrame)
+  for1 <- tclVar(dialog.values$initial.for1)
+  for1Field <- ttkentry(for1Frame, width = "20", textvariable = for1)
+
+  for2Frame <- tkframe(dataFrame)
+  for2 <- tclVar(dialog.values$initial.for2)
+  for2Field <- ttkentry(for2Frame, width = "20", textvariable = for2)
+
+  for3Frame <- tkframe(dataFrame)
+  for3 <- tclVar(dialog.values$initial.for3)
+  for3Field <- ttkentry(for3Frame, width = "20", textvariable = for3)
+
+  for4Frame <- tkframe(dataFrame)
+  for4 <- tclVar(dialog.values$initial.for4)
+  for4Field <- ttkentry(for4Frame, width = "20", textvariable = for4)
+
+  tkgrid(labelRcmdr(responseFrame, text = gettextRcmdr("Response"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(fac1Frame, text = gettextRcmdr("Factor 1"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(fac2Frame, text = gettextRcmdr("Factor 2"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(fac3Frame, text = gettextRcmdr("Factor 3"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(fac4Frame, text = gettextRcmdr("Factor 4"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(for1Frame, text = gettextRcmdr("x1 Formula / ex) (a1-12)/8"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(for2Frame, text = gettextRcmdr("x2 Formula / ex) (a2-12)/8"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(for3Frame, text = gettextRcmdr("x3 Formula / ex) (a3-12)/8"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(for4Frame, text = gettextRcmdr("x4 Formula / ex) (a4-12)/8"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(responseField, sticky="w")
+  tkgrid(fac1Field, sticky="w")
+  tkgrid(fac2Field, sticky="w")
+  tkgrid(fac3Field, sticky="w")
+  tkgrid(fac4Field, sticky="w")
+  tkgrid(for1Field, sticky="w")
+  tkgrid(for2Field, sticky="w")
+  tkgrid(for3Field, sticky="w")
+  tkgrid(for4Field, sticky="w")
+  tkgrid(responseFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
+  tkgrid(fac1Frame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
+  tkgrid(fac2Frame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
+  tkgrid(fac3Frame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
+  tkgrid(fac4Frame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
+  tkgrid(for1Frame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
+  tkgrid(for2Frame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
+  tkgrid(for3Frame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
+  tkgrid(for4Frame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
+  tkgrid(dataFrame, sticky="w")
+  tkgrid(buttonsFrame, sticky = "w")
+  dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
+}
