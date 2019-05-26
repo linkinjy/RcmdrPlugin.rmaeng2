@@ -4,7 +4,7 @@ aanova <- function () {
   initializeDialog(title = gettextRcmdr("분산분석"))
   dataFrame <- tkframe(top)
   groupBox <- variableListBox(dataFrame, selectmode = "multiple",
-                              title = gettextRcmdr("요인 (하나 이상 선택)"),
+                              title = gettextRcmdr("Factors (pick one or more)"),
                               initialSelection = varPosn(dialog.values$initial.group, "all"))
   responseBox <- variableListBox(dataFrame, title = gettextRcmdr("Response Variable (pick one)"),
                                  initialSelection = varPosn(dialog.values$initial.response, "all"))
@@ -415,7 +415,7 @@ oneerror <- function () {
 usermeandiff <- function () {
   defaults <- list(initial.group = NULL,initial.response = NULL,initial.method="hsd")
   dialog.values <- getDialog("usermeandiff", defaults)
-  initializeDialog(title = gettextRcmdr("모평균차 : 요인 및 교호작용 (사용자 설정)"), use.tabs = FALSE)
+  initializeDialog(title = gettextRcmdr("반복이 없는 모평균차의 추정"), use.tabs = FALSE)
   dataFrame <- tkframe(top)
   groupBox <- variableListBox(dataFrame, selectmode = "multiple",
                               title = gettextRcmdr("요인 (하나 이상 선택)"),
@@ -464,7 +464,7 @@ usermeandiff <- function () {
 meandiff <- function () {
   defaults <- list(initial.group = NULL,initial.response = NULL,initial.method="hsd")
   dialog.values <- getDialog("meandiff", defaults)
-  initializeDialog(title = gettextRcmdr("모평균차 : 모든 요인 및 교호작용"), use.tabs = FALSE)
+  initializeDialog(title = gettextRcmdr("반복이 있는 모평균차의 추정"), use.tabs = FALSE)
   dataFrame <- tkframe(top)
   groupBox <- variableListBox(dataFrame, selectmode = "multiple",
                               title = gettextRcmdr("Factors (pick one or more)"),
@@ -877,6 +877,56 @@ qualaov <- function () {
   tkgrid(rowFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
   tkgrid(columnFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
   tkgrid(facFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
+  tkgrid(dataFrame, sticky="nw")
+  tkgrid(buttonsFrame, sticky = "w")
+  dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
+}
+
+orth <- function () {
+  defaults <- list(initial.design = "",initial.randomize = "TRUE",initial.replicates = "1")
+  dialog.values <- getDialog("orth", defaults)
+  initializeDialog(title = gettextRcmdr("직교배열법 난수표"), use.tabs = FALSE)
+  dataFrame <- tkframe(top)
+
+  onOK <- function() {
+    designn <- as.character(tclvalue(design))
+    ran <- as.character(tclvalue(randomize))
+    repli <- tclvalue(replicates)
+
+    if (length(designn) == 0) {
+      errorCondition(recall = orth, message = gettextRcmdr("You must Fill in the Blank."))
+      return()}
+
+    putDialog ("orth", list (initial.design = designn, initial.randomize = ran, initial.replicates = repli))
+    closeDialog()
+
+    doItAndPrint(paste("kdesign(",'"',designn,'"',",","randomize=",ran,",","replicates=",repli,")", sep = ""))
+    tkfocus(CommanderWindow())
+  }
+
+  OKCancelHelp(helpSubject = "taguchiDesign", model = TRUE, reset = "orth", apply = "orth")
+
+  designFrame <- tkframe(dataFrame)
+  design <- tclVar(dialog.values$initial.design)
+  designField <- ttkentry(designFrame, width = "12", textvariable = design)
+
+  randomizeFrame <- tkframe(dataFrame)
+  randomize <- tclVar(dialog.values$initial.randomize)
+  randomizeField <- ttkentry(randomizeFrame, width = "12", textvariable = randomize)
+
+  replicatesFrame <- tkframe(dataFrame)
+  replicates <- tclVar(dialog.values$initial.replicates)
+  replicatesField <- ttkentry(replicatesFrame, width = "12", textvariable = replicates)
+
+  tkgrid(labelRcmdr(designFrame, text = gettextRcmdr("다구찌 디자인(입력 : Help 버튼에서 디자인을 참고하십시오)"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(randomizeFrame, text = gettextRcmdr("랜덤화 / TRUE or FALSE"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(replicatesFrame, text = gettextRcmdr("반복수"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(designField, sticky="w")
+  tkgrid(randomizeField, sticky="w")
+  tkgrid(replicatesField, sticky="w")
+  tkgrid(designFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
+  tkgrid(randomizeFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
+  tkgrid(replicatesFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
   tkgrid(dataFrame, sticky="nw")
   tkgrid(buttonsFrame, sticky = "w")
   dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
