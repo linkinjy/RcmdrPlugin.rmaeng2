@@ -26,6 +26,7 @@ aanova <- function () {
 
     .activeDataSet <- ActiveDataSet()
     groups.list <- paste(paste(groups, sep = ""), collapse = ", ")
+    doItAndPrint(paste(paste(rep(groups),rep('<-'),rep(.activeDataSet),rep('$'),groups, sep = ""), collapse = ","))
     doItAndPrint(paste("aov.t(", .activeDataSet,"$",response,"~", formull,",ranfac=",'"',ranfacc,'"',")", sep = ""))
     tkfocus(CommanderWindow())
   }
@@ -41,7 +42,7 @@ aanova <- function () {
   ranfacField <- ttkentry(ranfacFrame, width = "20", textvariable = ranfac)
 
   tkgrid(labelRcmdr(formulFrame, text = gettextRcmdr("Formula / ex) a+b+c+a*b+b*c+c*a+a*b*c"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
-  tkgrid(labelRcmdr(ranfacFrame, text = gettextRcmdr("Random Factor"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(ranfacFrame, text = gettextRcmdr("변량인자"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
   tkgrid(formulField, sticky="w")
   tkgrid(ranfacField, sticky="w")
   tkgrid(formulFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
