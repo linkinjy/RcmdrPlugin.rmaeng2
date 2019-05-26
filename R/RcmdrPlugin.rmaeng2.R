@@ -1059,3 +1059,55 @@ fr.f2 <- function () {
   tkgrid(buttonsFrame, sticky = "w")
   dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
 }
+
+steep <- function () {
+  defaults <- list(initial.group = NULL, initial.response = NULL)
+  dialog.values <- getDialog("steep", defaults)
+  initializeDialog(title = gettextRcmdr("최대경사법"))
+  mainFrame <- tkframe(top)
+  UpdateModelNumber()
+  modelName <- tclVar(paste("AnovaModel.", getRcmdr("modelNumber"),
+                            sep = ""))
+  modelFrame <- tkframe(top)
+  model <- ttkentry(modelFrame, width = "20", textvariable = modelName)
+  groupBox <- variableListBox(mainFrame, selectmode = "multiple",
+                              title = gettextRcmdr("Factors (pick one or more)"),
+                              initialSelection = varPosn(dialog.values$initial.group, "all"))
+  responseBox <- variableListBox(mainFrame, title = gettextRcmdr("Response Variable (pick one)"),
+                                 initialSelection = varPosn(dialog.values$initial.response, "all"))
+
+  onOK <- function() {
+    groups <- getSelection(groupBox)
+    response <- getSelection(responseBox)
+    modelValue <- trim.blanks(tclvalue(modelName))
+
+
+    if (length(groups) == 0) {
+      errorCondition(recall = steep, message = gettextRcmdr("You must select at least one factor."))
+      return()}
+    if (length(response) == 0) {
+      errorCondition(recall = steep, message = gettextRcmdr("You must select at least one factor."))
+      return()}
+    putDialog ("steep", list (initial.group = groups, initial.response = response))
+    closeDialog()
+
+    .activeDataSet <- ActiveDataSet()
+    groups.list <- paste(paste(groups, sep = ""), collapse = ",")
+    justDoIt(paste("rsm(",response,"~SO(",groups.list,"),data=",.activeDataSet,")", sep = ""))
+    justDoIt(paste(modelValue, "<-rsm(",response,"~SO(",groups.list,"),data=",.activeDataSet,")", sep = ""))
+    doItAndPrint(paste("steepest(", modelValue,")", sep = ""))
+
+    tkfocus(CommanderWindow())
+  }
+
+  OKCancelHelp(helpSubject = "Anova", model = TRUE, reset = "conto", apply = "conto")
+
+  tkgrid(labelRcmdr(mainFrame, text="  "), sticky = "nw")
+  tkgrid(mainFrame, sticky="nw")
+  tkgrid(getFrame(groupBox), labelRcmdr(mainFrame, text="  "), getFrame(responseBox), sticky = "nw")
+  tkgrid(labelRcmdr(modelFrame, text = gettextRcmdr("Enter name for model: ")),
+         model, sticky = "w")
+  tkgrid(modelFrame, sticky = "w")
+  tkgrid(buttonsFrame, sticky = "w")
+  dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
+}
