@@ -1225,3 +1225,41 @@ rsmanova <- function () {
   tkgrid(buttonsFrame, sticky = "w")
   dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
 }
+
+equalvar <- function () {
+  defaults <- list(initial.group = NULL, initial.response = NULL)
+  dialog.values <- getDialog("equalvar", defaults)
+  initializeDialog(title = gettextRcmdr("등분산성 검정"))
+  dataFrame <- tkframe(top)
+  groupBox <- variableListBox(dataFrame, selectmode = "single",
+                              title = gettextRcmdr("요인 (하나 선택)"),
+                              initialSelection = varPosn(dialog.values$initial.group, "all"))
+  responseBox <- variableListBox(dataFrame, title = gettextRcmdr("Response Variable (pick one)"),
+                                 initialSelection = varPosn(dialog.values$initial.response, "all"))
+
+  onOK <- function() {
+    groups <- getSelection(groupBox)
+    response <- getSelection(responseBox)
+
+    if (length(groups) == 0) {
+      errorCondition(recall = equalvar, message = gettextRcmdr("You must select at least one factor."))
+      return()}
+    if (length(response) == 0) {
+      errorCondition(recall = equalvar, message = gettextRcmdr("You must select at least one factor."))
+      return()}
+    putDialog ("equalvar", list (initial.group = groups, initial.response = response))
+    closeDialog()
+
+    .activeDataSet <- ActiveDataSet()
+    groups.list <- paste(paste(groups, sep = ""), collapse = ", ")
+    doItAndPrint(paste("equal.var(", .activeDataSet,"$",response,"~", .activeDataSet,"$",groups,")", sep = ""))
+    tkfocus(CommanderWindow())
+  }
+
+  OKCancelHelp(helpSubject = "Anova", model = TRUE, reset = "equlvar", apply = "equalvar")
+
+  tkgrid(getFrame(groupBox), labelRcmdr(dataFrame, text="  "), getFrame(responseBox), sticky = "nw")
+  tkgrid(dataFrame, sticky="w")
+  tkgrid(buttonsFrame, sticky = "w")
+  dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
+}
