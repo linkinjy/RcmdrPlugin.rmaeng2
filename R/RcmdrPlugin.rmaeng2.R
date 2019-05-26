@@ -931,3 +931,71 @@ orth <- function () {
   tkgrid(buttonsFrame, sticky = "w")
   dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
 }
+
+ffr.f2 <- function () {
+  defaults <- list(initial.row = "0", initial.facnum = "0", initial.random = "TRUE", initial.block = 'c("ABC","BCD")')
+  dialog.values <- getDialog("ffr.f2", defaults)
+  initializeDialog(title = gettextRcmdr("교락법 난수표"))
+  mainFrame <- tkframe(top)
+  UpdateModelNumber()
+  modelName <- tclVar(paste("AnovaModel.", getRcmdr("modelNumber"),
+                            sep = ""))
+  modelFrame <- tkframe(top)
+  model <- ttkentry(modelFrame, width = "20", textvariable = modelName)
+
+  onOK <- function() {
+    modelValue <- trim.blanks(tclvalue(modelName))
+
+    roww <- tclvalue(row)
+    facnums <- tclvalue(facnum)
+    randoms <- as.character(tclvalue(random))
+    blocks <- as.character(tclvalue(block))
+
+    putDialog ("ffr.f2", list (initial.row = roww, initial.facnum = facnums, initial.random = randoms, initial.block = blocks))
+    closeDialog()
+
+    doItAndPrint(paste("FrF2(", roww,"," ,facnums,",randomize=",randoms, ",blocks=",blocks,")", sep = ""))
+    justDoIt(paste(modelValue, "<-FrF2(", roww,"," ,facnums,",randomize=",randoms, ",blocks=",blocks,")", sep = ""))
+    activeModel(modelValue)
+
+    tkfocus(CommanderWindow())
+  }
+
+  OKCancelHelp(helpSubject = "Anova", model = TRUE, reset = "ffr.f2", apply = "ffr.f2")
+
+  rowFrame <- tkframe(mainFrame)
+  row <- tclVar(dialog.values$initial.row)
+  rowField <- ttkentry(rowFrame, width = "12", textvariable = row)
+
+  facnumFrame <- tkframe(mainFrame)
+  facnum <- tclVar(dialog.values$initial.facnum)
+  facnumField <- ttkentry(facnumFrame, width = "12", textvariable = facnum)
+
+  randomFrame <- tkframe(mainFrame)
+  random <- tclVar(dialog.values$initial.random)
+  randomField <- ttkentry(randomFrame, width = "12", textvariable = random)
+
+  blockFrame <- tkframe(mainFrame)
+  block <- tclVar(dialog.values$initial.block)
+  blockField <- ttkentry(blockFrame, width = "12", textvariable = block)
+
+  tkgrid(labelRcmdr(mainFrame, text="  "), sticky = "nw")
+  tkgrid(mainFrame, sticky="nw")
+  tkgrid(labelRcmdr(modelFrame, text = gettextRcmdr("Enter name for model: ")),
+         model, sticky = "w")
+  tkgrid(modelFrame, sticky = "w")
+  tkgrid(labelRcmdr(rowFrame, text = gettextRcmdr("행의 수"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(facnumFrame, text = gettextRcmdr("인자의 수"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(randomFrame, text = gettextRcmdr("랜덤화 / TRUE or FALSE"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(blockFrame, text = gettextRcmdr("블록"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(rowField, sticky="w")
+  tkgrid(facnumField, sticky="w")
+  tkgrid(randomField, sticky="w")
+  tkgrid(blockField, sticky="w")
+  tkgrid(rowFrame, labelRcmdr(mainFrame, text = " "), sticky = "nw")
+  tkgrid(facnumFrame, labelRcmdr(mainFrame, text = " "), sticky = "nw")
+  tkgrid(randomFrame, labelRcmdr(mainFrame, text = " "), sticky = "nw")
+  tkgrid(blockFrame, labelRcmdr(mainFrame, text = " "), sticky = "nw")
+  tkgrid(buttonsFrame, sticky = "w")
+  dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
+}
