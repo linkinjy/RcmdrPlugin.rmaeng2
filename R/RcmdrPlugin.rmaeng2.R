@@ -1,10 +1,10 @@
 aanova <- function () {
-  defaults <- list(initial.group = NULL, initial.response = NULL, initial.formul = "")
+  defaults <- list(initial.group = NULL, initial.response = NULL, initial.formul = "", initial.ranfac = "")
   dialog.values <- getDialog("aanova", defaults)
   initializeDialog(title = gettextRcmdr("분산분석"))
   dataFrame <- tkframe(top)
   groupBox <- variableListBox(dataFrame, selectmode = "multiple",
-                              title = gettextRcmdr("Factors (pick one or more)"),
+                              title = gettextRcmdr("요인 (하나 이상 선택)"),
                               initialSelection = varPosn(dialog.values$initial.group, "all"))
   responseBox <- variableListBox(dataFrame, title = gettextRcmdr("Response Variable (pick one)"),
                                  initialSelection = varPosn(dialog.values$initial.response, "all"))
@@ -13,6 +13,7 @@ aanova <- function () {
     groups <- getSelection(groupBox)
     response <- getSelection(responseBox)
     formull <- as.character(tclvalue(formul))
+    ranfacc <- as.character(tclvalue(ranfac))
 
     if (length(groups) == 0) {
       errorCondition(recall = aanova, message = gettextRcmdr("You must select at least one factor."))
@@ -20,12 +21,12 @@ aanova <- function () {
     if (length(response) == 0) {
       errorCondition(recall = aanova, message = gettextRcmdr("You must select at least one factor."))
       return()}
-    putDialog ("aanova", list (initial.group = groups, initial.response = response, initial.formul = formull))
+    putDialog ("aanova", list (initial.group = groups, initial.response = response, initial.formul = formull, initial.ranfac = ranfacc))
     closeDialog()
 
     .activeDataSet <- ActiveDataSet()
     groups.list <- paste(paste(groups, sep = ""), collapse = ", ")
-    doItAndPrint(paste("aov(", response,"~", formull,",data=",.activeDataSet,")", sep = ""))
+    doItAndPrint(paste("aov.t(", .activeDataSet,"$",response,"~", formull,",ranfac=",'"',ranfacc,'"',")", sep = ""))
     tkfocus(CommanderWindow())
   }
 
@@ -35,9 +36,16 @@ aanova <- function () {
   formul <- tclVar(dialog.values$initial.formul)
   formulField <- ttkentry(formulFrame, width = "20", textvariable = formul)
 
+  ranfacFrame <- tkframe(dataFrame)
+  ranfac <- tclVar(dialog.values$initial.ranfac)
+  ranfacField <- ttkentry(ranfacFrame, width = "20", textvariable = ranfac)
+
   tkgrid(labelRcmdr(formulFrame, text = gettextRcmdr("Formula / ex) a+b+c+a*b+b*c+c*a+a*b*c"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(ranfacFrame, text = gettextRcmdr("Random Factor"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
   tkgrid(formulField, sticky="w")
+  tkgrid(ranfacField, sticky="w")
   tkgrid(formulFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
+  tkgrid(ranfacFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
   tkgrid(getFrame(groupBox), labelRcmdr(dataFrame, text="  "), getFrame(responseBox), sticky = "nw")
   tkgrid(dataFrame, sticky="w")
   tkgrid(buttonsFrame, sticky = "w")
