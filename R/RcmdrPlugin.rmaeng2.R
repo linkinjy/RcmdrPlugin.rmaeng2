@@ -1419,3 +1419,80 @@ dispwin <- function () {
   tkgrid(buttonsFrame, sticky = "w")
   dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
 }
+
+meanwin <- function () {
+  defaults <- list(initial.group = NULL, initial.response = NULL, initial.formul = "",initial.fac = "", initial.ranfac = "", initial.alpha = 0.05)
+  dialog.values <- getDialog("meanwin", defaults)
+  initializeDialog(title = gettextRcmdr("모평균 추정"))
+  dataFrame <- tkframe(top)
+  groupBox <- variableListBox(dataFrame, selectmode = "multiple",
+                              title = gettextRcmdr("요인 (하나 이상 선택)"),
+                              initialSelection = varPosn(dialog.values$initial.group, "all"))
+  responseBox <- variableListBox(dataFrame, title = gettextRcmdr("Response Variable (pick one)"),
+                                 initialSelection = varPosn(dialog.values$initial.response, "all"))
+
+  onOK <- function() {
+    groups <- getSelection(groupBox)
+    response <- getSelection(responseBox)
+    formull <- as.character(tclvalue(formul))
+    facc <- as.character(tclvalue(fac))
+    ranfacc <- as.character(tclvalue(ranfac))
+    alp <- tclvalue(alpha)
+
+    if (length(groups) == 0) {
+      errorCondition(recall = meanwin, message = gettextRcmdr("You must select at least one factor."))
+      return()}
+    if (length(response) == 0) {
+      errorCondition(recall = meanwin, message = gettextRcmdr("You must select at least one factor."))
+      return()}
+    putDialog ("meanwin", list (initial.group = groups, initial.response = response, initial.formul = formull ,initial.fac = facc, initial.ranfac = ranfacc, initial.alpha = alp))
+    closeDialog()
+
+    .activeDataSet <- ActiveDataSet()
+    groups.list <- paste(paste(groups, sep = ""), collapse = ", ")
+    doItAndPrint(paste(paste(rep(groups),rep('<-'),rep(.activeDataSet),rep('$'),groups, sep = ""), collapse = "
+                       "))
+    if (ranfacc == ""){
+      doItAndPrint(paste("mean.est(", .activeDataSet,"$",response,"~", formull,",data =",.activeDataSet,",factor =",'"',facc,'"',",alpha = ",alp,")", sep = ""))
+    }
+    if (ranfac != ""){
+      doItAndPrint(paste("mean.est(", .activeDataSet,"$",response,"~", formull,",data =",.activeDataSet,",factor =",'"',facc,'"',",ranfac=",'"',ranfacc,'"',",alpha = ",alp,")", sep = ""))
+    }
+    tkfocus(CommanderWindow())
+  }
+
+  OKCancelHelp(helpSubject = "Anova", model = TRUE, reset = "meanwin", apply = "meanwin")
+
+  formulFrame <- tkframe(dataFrame)
+  formul <- tclVar(dialog.values$initial.formul)
+  formulField <- ttkentry(formulFrame, width = "20", textvariable = formul)
+
+  facFrame <- tkframe(dataFrame)
+  fac <- tclVar(dialog.values$initial.fac)
+  facField <- ttkentry(facFrame, width = "20", textvariable = fac)
+
+  ranfacFrame <- tkframe(dataFrame)
+  ranfac <- tclVar(dialog.values$initial.ranfac)
+  ranfacField <- ttkentry(ranfacFrame, width = "20", textvariable = ranfac)
+
+  alphaFrame <- tkframe(dataFrame)
+  alpha <- tclVar(dialog.values$initial.alpha)
+  alphaField <- ttkentry(alphaFrame, width = "20", textvariable = alpha)
+
+  tkgrid(labelRcmdr(formulFrame, text = gettextRcmdr("Formula / ex) a+b+c+a*b+b*c+c*a+a*b*c"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(facFrame, text = gettextRcmdr("모평균 추정 인자(하나 선택)"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(ranfacFrame, text = gettextRcmdr("변량인자"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(alphaFrame, text = gettextRcmdr("Alpha"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(formulField, sticky="w")
+  tkgrid(facField, sticky="w")
+  tkgrid(ranfacField, sticky="w")
+  tkgrid(alphaField, sticky="w")
+  tkgrid(formulFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
+  tkgrid(facFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
+  tkgrid(ranfacFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
+  tkgrid(alphaFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
+  tkgrid(getFrame(groupBox), labelRcmdr(dataFrame, text="  "), getFrame(responseBox), sticky = "nw")
+  tkgrid(dataFrame, sticky="w")
+  tkgrid(buttonsFrame, sticky = "w")
+  dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
+}
