@@ -421,9 +421,9 @@ oneerror <- function () {
   dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
 }
 
-usermeandiff <- function () {
-  defaults <- list(initial.group = NULL,initial.response = NULL,initial.method="hsd")
-  dialog.values <- getDialog("usermeandiff", defaults)
+nomeandiff <- function () {
+  defaults <- list(initial.group = NULL,initial.response = NULL,initial.formul = "",initial.method="hsd", initial.fac = "", initial.two = "FALSE", initial.ran = "FALSE")
+  dialog.values <- getDialog("nomeandiff", defaults)
   initializeDialog(title = gettextRcmdr("반복이 없는 모평균차의 추정"), use.tabs = FALSE)
   dataFrame <- tkframe(top)
   groupBox <- variableListBox(dataFrame, selectmode = "multiple",
@@ -435,89 +435,157 @@ usermeandiff <- function () {
   onOK <- function() {
     groups <- getSelection(groupBox)
     response <- getSelection(responseBox)
+    formull <- as.character(tclvalue(formul))
     methodd <- as.character(tclvalue(method))
+    facc <- as.character(tclvalue(fac))
+    twoo <- as.character(tclvalue(two))
+    rann <- as.character(tclvalue(ran))
 
     if (length(groups) == 0) {
-      errorCondition(recall = sscatterplot, message = gettextRcmdr("You must select at least one factor."))
+      errorCondition(recall = nomeandiff, message = gettextRcmdr("You must select at least one factor."))
       return()}
     if (length(response) == 0) {
-      errorCondition(recall = sscatterplot, message = gettextRcmdr("You must select at least one factor."))
+      errorCondition(recall = nomeandiff, message = gettextRcmdr("You must select at least one factor."))
       return()}
 
-    putDialog ("usermeandiff", list (initial.group = groups, initial.response = response, initial.method = methodd))
+    putDialog ("nomeandiff", list (initial.group = groups, initial.response = response, initial.formul = formull, initial.method = methodd, initial.fac = facc, initial.two = twoo, initial.ran = rann))
     closeDialog()
 
     .activeDataSet <- ActiveDataSet()
-    groups.list <- paste(paste(rep("factor"),rep("("),rep(ActiveDataSet()),rep('$'),groups, rep(")"),sep = ""), collapse = "+")
-    doItAndPrint(paste("mean.diff(", .activeDataSet,"$",response,"~",groups.list,",","method=",'"',methodd,'"',")", sep = ""))
+    doItAndPrint(paste(paste(rep(groups),rep('<-'),rep(.activeDataSet),rep('$'),groups, sep = ""), collapse = "
+"))
+    doItAndPrint(paste("mean.diff(", .activeDataSet,"$",response,"~",formull,",method=",'"',methodd,'"',",fac=",'"',facc,'"',",two=",twoo,",ran=",rann,")", sep = ""))
     tkfocus(CommanderWindow())
   }
 
-  OKCancelHelp(helpSubject = "Anova", model = TRUE, reset = "usermeandiff", apply = "usermeandiff")
+  OKCancelHelp(helpSubject = "Anova", model = TRUE, reset = "nomeandiff", apply = "nomeandiff")
+
+  formulFrame <- tkframe(dataFrame)
+  formul <- tclVar(dialog.values$initial.formul)
+  formulField <- ttkentry(formulFrame, width = "12", textvariable = formul)
 
   methodFrame <- tkframe(dataFrame)
   method <- tclVar(dialog.values$initial.method)
   methodField <- ttkentry(methodFrame, width = "12", textvariable = method)
 
-  tkgrid(getFrame(groupBox), labelRcmdr(dataFrame, text="  "), sticky = "nw")
-  tkgrid(getFrame(responseBox), labelRcmdr(dataFrame, text=" "), sticky = "nw")
+  facFrame <- tkframe(dataFrame)
+  fac <- tclVar(dialog.values$initial.fac)
+  facField <- ttkentry(facFrame, width = "12", textvariable = fac)
+
+  twoFrame <- tkframe(dataFrame)
+  two <- tclVar(dialog.values$initial.two)
+  twoField <- ttkentry(twoFrame, width = "12", textvariable = two)
+
+  ranFrame <- tkframe(dataFrame)
+  ran <- tclVar(dialog.values$initial.ran)
+  ranField <- ttkentry(ranFrame, width = "12", textvariable = ran)
+
+  tkgrid(getFrame(groupBox), labelRcmdr(dataFrame, text="  "), getFrame(responseBox), sticky = "nw")
+  tkgrid(labelRcmdr(formulFrame, text = gettextRcmdr("Formula / ex) a+b"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
   tkgrid(labelRcmdr(methodFrame, text = gettextRcmdr("방법
 (입력 : hsd / lsd / bonferroni / scheffe / newmankeuls / duncan)"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(facFrame, text = gettextRcmdr("대상 인자(하나 선택)"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(twoFrame, text = gettextRcmdr("출력
+TRUE = 대상 인자(모수인자)만 출력 / FALSE = 대상 인자(변량인자)를 제외하고 출력"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(ranFrame, text = gettextRcmdr("변량 인자 유무 / TRUE : 있다 or FALSE : 없다"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(formulField, sticky="w")
   tkgrid(methodField, sticky="w")
+  tkgrid(facField, sticky="w")
+  tkgrid(twoField, sticky="w")
+  tkgrid(ranField, sticky="w")
+  tkgrid(formulFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
   tkgrid(methodFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
+  tkgrid(facFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
+  tkgrid(twoFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
+  tkgrid(ranFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
   tkgrid(dataFrame, sticky="nw")
   tkgrid(buttonsFrame, sticky = "w")
   dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
 }
 
-meandiff <- function () {
-  defaults <- list(initial.group = NULL,initial.response = NULL,initial.method="hsd")
-  dialog.values <- getDialog("meandiff", defaults)
+remeandiff <- function () {
+  defaults <- list(initial.group = NULL,initial.response = NULL,initial.formul = "",initial.method="hsd", initial.fac = "", initial.two = "FALSE", initial.ran = "FALSE")
+  dialog.values <- getDialog("remeandiff", defaults)
   initializeDialog(title = gettextRcmdr("반복이 있는 모평균차의 추정"), use.tabs = FALSE)
   dataFrame <- tkframe(top)
   groupBox <- variableListBox(dataFrame, selectmode = "multiple",
-                              title = gettextRcmdr("Factors (pick one or more)"),
+                              title = gettextRcmdr("요인 (하나 이상 선택)"),
                               initialSelection = varPosn(dialog.values$initial.group, "all"))
-  responseBox <- variableListBox(dataFrame, title = gettextRcmdr("Response Variable (pick one)"),
+  responseBox <- variableListBox(dataFrame, title = gettextRcmdr("반응변수 (하나 선택)"),
                                  initialSelection = varPosn(dialog.values$initial.response, "all"))
 
   onOK <- function() {
     groups <- getSelection(groupBox)
     response <- getSelection(responseBox)
+    formull <- as.character(tclvalue(formul))
     methodd <- as.character(tclvalue(method))
+    facc <- as.character(tclvalue(fac))
+    twoo <- as.character(tclvalue(two))
+    rann <- as.character(tclvalue(ran))
 
     if (length(groups) == 0) {
-      errorCondition(recall = sscatterplot, message = gettextRcmdr("You must select at least one factor."))
+      errorCondition(recall = remeandiff, message = gettextRcmdr("You must select at least one factor."))
       return()}
     if (length(response) == 0) {
-      errorCondition(recall = sscatterplot, message = gettextRcmdr("You must select at least one factor."))
+      errorCondition(recall = remeandiff, message = gettextRcmdr("You must select at least one factor."))
       return()}
 
-    putDialog ("meandiff", list (initial.group = groups, initial.response = response, initial.method = methodd))
+    putDialog ("remeandiff", list (initial.group = groups, initial.response = response, initial.formul = formull, initial.method = methodd, initial.fac = facc, initial.two = twoo, initial.ran = rann))
     closeDialog()
 
     .activeDataSet <- ActiveDataSet()
-    groups.list <- paste(paste(rep("factor"),rep("("),rep(ActiveDataSet()),rep('$'),groups, rep(")"),sep = ""), collapse = "*")
-    doItAndPrint(paste("mean.diff(", .activeDataSet,"$",response,"~",groups.list,",","method=",'"',methodd,'"',")", sep = ""))
+    groups.list <- paste(paste(groups, sep = ""), collapse = ", ")
+    doItAndPrint(paste(paste(rep(groups),rep('<-'),rep(.activeDataSet),rep('$'),groups, sep = ""), collapse = "
+"))
+    doItAndPrint(paste("mean.diff(", .activeDataSet,"$",response,"~",formull,",method=",'"',methodd,'"',",fac=",'"',facc,'"',",two=",twoo,",ran=",rann,")", sep = ""))
     tkfocus(CommanderWindow())
   }
 
-  OKCancelHelp(helpSubject = "Anova", model = TRUE, reset = "meandiff", apply = "meandiff")
+  OKCancelHelp(helpSubject = "Anova", model = TRUE, reset = "remeandiff", apply = "remeandiff")
+
+  formulFrame <- tkframe(dataFrame)
+  formul <- tclVar(dialog.values$initial.formul)
+  formulField <- ttkentry(formulFrame, width = "12", textvariable = formul)
 
   methodFrame <- tkframe(dataFrame)
   method <- tclVar(dialog.values$initial.method)
   methodField <- ttkentry(methodFrame, width = "12", textvariable = method)
 
-  tkgrid(getFrame(groupBox), labelRcmdr(dataFrame, text="  "), sticky = "nw")
-  tkgrid(getFrame(responseBox), labelRcmdr(dataFrame, text=" "), sticky = "nw")
+  facFrame <- tkframe(dataFrame)
+  fac <- tclVar(dialog.values$initial.fac)
+  facField <- ttkentry(facFrame, width = "12", textvariable = fac)
+
+  twoFrame <- tkframe(dataFrame)
+  two <- tclVar(dialog.values$initial.two)
+  twoField <- ttkentry(twoFrame, width = "12", textvariable = two)
+
+  ranFrame <- tkframe(dataFrame)
+  ran <- tclVar(dialog.values$initial.ran)
+  ranField <- ttkentry(ranFrame, width = "12", textvariable = ran)
+
+  tkgrid(getFrame(groupBox), labelRcmdr(dataFrame, text="  "), getFrame(responseBox), sticky = "nw")
+  tkgrid(labelRcmdr(formulFrame, text = gettextRcmdr("Formula / ex) a*b"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
   tkgrid(labelRcmdr(methodFrame, text = gettextRcmdr("방법
 (입력 : hsd / lsd / bonferroni / scheffe / newmankeuls / duncan)"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(facFrame, text = gettextRcmdr("대상 인자(하나 선택)"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(twoFrame, text = gettextRcmdr("출력
+TRUE = 대상 인자(모수인자)만 출력 / FALSE = 대상 인자(변량인자)를 제외하고 출력"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(ranFrame, text = gettextRcmdr("변량 인자 유무 / TRUE : 있다 or FALSE : 없다"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(formulField, sticky="w")
   tkgrid(methodField, sticky="w")
+  tkgrid(facField, sticky="w")
+  tkgrid(twoField, sticky="w")
+  tkgrid(ranField, sticky="w")
+  tkgrid(formulFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
   tkgrid(methodFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
+  tkgrid(facFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
+  tkgrid(twoFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
+  tkgrid(ranFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
   tkgrid(dataFrame, sticky="nw")
   tkgrid(buttonsFrame, sticky = "w")
   dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
 }
+
 
 facrandomtable <- function () {
   defaults <- list(initial.level = "c(3,3,2)", initial.nvars = "3", initial.repet="2", initial.std="FALSE")
