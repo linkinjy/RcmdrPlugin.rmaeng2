@@ -43,6 +43,7 @@ item    multiMenu       command         "최적 수준 조합"                    optw
 item    rmaeng2Menu       cascade         "다원배치법"                                 multiMenu                   ""                      ""
 menu    splitMenu       rmaeng2Menu         ""                                      ""                          ""                      ""
 item    splitMenu       command         "분할법 난수표"                    designsplit          ""                      ""
+item    splitMenu       command         "분산분석"                    disp1win          ""                      ""
 item    splitMenu       command         "주효과도"                    mainplot          ""                      ""
 item    splitMenu       command         "교호작용도"                    interactionplot          ""                      ""
 item    splitMenu       command         "산점도"                    sscatterplot          ""                      ""
