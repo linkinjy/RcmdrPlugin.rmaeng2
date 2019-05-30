@@ -26,8 +26,17 @@ aanova <- function () {
 
     .activeDataSet <- ActiveDataSet()
     groups.list <- paste(paste(groups, sep = ""), collapse = ", ")
-    doItAndPrint(paste(paste(rep(groups),rep('<-'),rep(.activeDataSet),rep('$'),groups, sep = ""), collapse = ","))
-    doItAndPrint(paste("aov.t(", .activeDataSet,"$",response,"~", formull,",ranfac=",'"',ranfacc,'"',")", sep = ""))
+    doItAndPrint(paste(paste(rep(groups),rep('<-'),rep("as.factor("),rep(.activeDataSet),rep('$'),groups,")", sep = ""), collapse = "
+"))
+    doItAndPrint(paste(paste(rep(.activeDataSet),rep('$'),rep(groups),rep('<-'),rep("as.factor("),rep(.activeDataSet),rep('$'),groups,")", sep = ""), collapse = "
+"))
+    if (ranfacc == ""){
+    doItAndPrint(paste("aov.t(", .activeDataSet,"$",response,"~", formull,")", sep = ""))
+    }
+    if (ranfacc != ""){
+      doItAndPrint(paste("aov.t(", .activeDataSet,"$",response,"~", formull,",ranfac=",'"',ranfacc,'"',")", sep = ""))
+
+    }
     tkfocus(CommanderWindow())
   }
 
@@ -824,7 +833,11 @@ qualaov <- function () {
 
     .activeDataSet <- ActiveDataSet()
     groups.list <- paste(paste(groups, sep = ""), collapse = "+")
-    doItAndPrint(paste("qual.aov(", response,"~",groups.list,",",.activeDataSet,",","r=",repe,",", "i=",rows,",","j=",columns,",","fac=",facc,")", sep = ""))
+    doItAndPrint(paste(paste(rep(groups),rep('<-'),rep("as.factor("),rep(.activeDataSet),rep('$'),groups,")", sep = ""), collapse = "
+"))
+    doItAndPrint(paste(paste(rep(.activeDataSet),rep('$'),rep(groups),rep('<-'),rep("as.factor("),rep(.activeDataSet),rep('$'),groups,")", sep = ""), collapse = "
+"))
+    doItAndPrint(paste("qual.aov(", .activeDataSet,'$',response,"~",groups.list,",",.activeDataSet,",","r=",repe,",", "i=",rows,",","j=",columns,",","fac=",facc,")", sep = ""))
     tkfocus(CommanderWindow())
   }
 
@@ -1334,7 +1347,10 @@ dispwin <- function () {
 
     .activeDataSet <- ActiveDataSet()
     groups.list <- paste(paste(groups, sep = ""), collapse = ", ")
-    doItAndPrint(paste(paste(rep(groups),rep('<-'),rep(.activeDataSet),rep('$'),groups, sep = ""), collapse = ","))
+    doItAndPrint(paste(paste(rep(groups),rep('<-'),rep("as.factor("),rep(.activeDataSet),rep('$'),groups,")", sep = ""), collapse = "
+"))
+    doItAndPrint(paste(paste(rep(.activeDataSet),rep('$'),rep(groups),rep('<-'),rep("as.factor("),rep(.activeDataSet),rep('$'),groups,")", sep = ""), collapse = "
+"))
     if (ranfacc == ""){
       doItAndPrint(paste("dispersion(", .activeDataSet,"$",response,"~", formull,",data=",.activeDataSet,",ranfac=NULL",",rc=",rcc,",sp=",spp, ",nest=",nestt, ",fac=",facc,")", sep = ""))
     }
