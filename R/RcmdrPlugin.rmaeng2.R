@@ -1310,7 +1310,7 @@ conto <- function () {
     doItAndPrint(paste(modelValue, "<-rsm(",response,"~SO(",groups.list,"),data=",.activeDataSet,")", sep = ""))
     {
       groups.list <- paste(paste(groups, sep = ""), collapse = "+")
-      doItAndPrint(paste("contour(", modelValue,",~",groups.list,")", sep = ""))
+      doItAndPrint(paste("contour(", modelValue,",~",groups.list,',col="blue")', sep = ""))
     }
     tkfocus(CommanderWindow())
   }
@@ -1677,7 +1677,7 @@ perwin <- function () {
     doItAndPrint(paste(modelValue, "<-rsm(",response,"~SO(",groups.list,"),data=",.activeDataSet,")", sep = ""))
     {
       groups.list <- paste(paste(groups, sep = ""), collapse = "+")
-      doItAndPrint(paste("persp(", modelValue,",~",groups.list,',contours=list(z="bottom")',")", sep = ""))
+      doItAndPrint(paste("persp(", modelValue,",~",groups.list,',contours=list(z="bottom"), col="blue"',")", sep = ""))
     }
     tkfocus(CommanderWindow())
   }
