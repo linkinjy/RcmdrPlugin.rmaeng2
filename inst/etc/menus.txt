@@ -75,7 +75,7 @@ item    respMenu       command         "중심합성계획"                    central
 item    respMenu       command         "Box-Benken 설계"                    boxbenken          ""                      ""
 item    respMenu       command         "반응표면 분산분석"                    rsmanova          ""                      ""
 item    respMenu       command         "등고선도"                    conto          ""                      ""
-item    respMenu       command         "3D 도표"                    conto          ""                      ""
+item    respMenu       command         "3D 도표"                    perwin          ""                      ""
 item    respMenu       command         "최대경사법"                    steep          ""                      ""
 item    respMenu       command         "모평균차의 추정 "                    nomeandiff          ""                      ""
 item    respMenu       command         "모평균 추정"                    meanwin          ""                      ""

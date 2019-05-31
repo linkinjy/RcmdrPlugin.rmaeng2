@@ -461,11 +461,13 @@ nomeandiff <- function () {
     .activeDataSet <- ActiveDataSet()
     doItAndPrint(paste(paste(rep(.activeDataSet),rep('$'),rep(groups),rep('<-'),rep("as.factor("),rep(.activeDataSet),rep('$'),groups,")", sep = ""), collapse = "
 "))
+    doItAndPrint(paste(paste(rep(groups),rep('<-'),rep(.activeDataSet),rep('$'),groups, sep = ""), collapse = "
+"))
     if (rann!=""){
-      doItAndPrint(paste("mean.diff(data=", .activeDataSet,",formula=",.activeDataSet,"$",response,"~",formull,",method=",'"',methodd,'"',",ranfac=",'"',rann,'"',")", sep = ""))
+      doItAndPrint(paste("mean.diff(data=", .activeDataSet,",formula=",response,"~",formull,",method=",'"',methodd,'"',",ranfac=",'"',rann,'"',")", sep = ""))
     }
     if (rann==""){
-      doItAndPrint(paste("mean.diff(data=", .activeDataSet,",formula=",.activeDataSet,"$",response,"~",formull,",method=",'"',methodd,'"',")", sep = ""))
+      doItAndPrint(paste("mean.diff(data=", .activeDataSet,",formula=",response,"~",formull,",method=",'"',methodd,'"',")", sep = ""))
     }
     tkfocus(CommanderWindow())
   }
@@ -741,7 +743,7 @@ designsplit <- function () {
     closeDialog()
 
     doItAndPrint(paste("design.split(", factor11,",", factor22,",","r=",repe,",","seed=",sed,",","randomization=", randoms,"," ,"std=",sttd,")", sep = ""))
-    justDoIt(paste(modelValue, "<-design.split(", factor11,",", factor22,",","r=",repe,",","seed=",sed,",","randomization=", randoms,"," ,"std=",sttd,")", sep = ""))
+    doItAndPrint(paste(modelValue, "<-design.split(", factor11,",", factor22,",","r=",repe,",","seed=",sed,",","randomization=", randoms,"," ,"std=",sttd,")", sep = ""))
     activeModel(modelValue)
     tkfocus(CommanderWindow())
   }
@@ -997,7 +999,7 @@ ffr.f2 <- function () {
 }
 
 fr.f2 <- function () {
-  defaults <- list(initial.row = "0", initial.facnum = "0", initial.random = "TRUE")
+  defaults <- list(initial.row = "0", initial.facnum = "0", initial.random = "TRUE", initial.gene = "")
   dialog.values <- getDialog("fr.f2", defaults)
   initializeDialog(title = gettextRcmdr("일부실시법 난수표"))
   mainFrame <- tkframe(top)
@@ -1013,18 +1015,19 @@ fr.f2 <- function () {
     roww <- tclvalue(row)
     facnums <- tclvalue(facnum)
     randoms <- as.character(tclvalue(random))
+    genee <- as.character(tclvalue(gene))
 
-    putDialog ("fr.f2", list (initial.row = roww, initial.facnum = facnums, initial.random = randoms))
+    putDialog ("fr.f2", list (initial.row = roww, initial.facnum = facnums, initial.random = randoms, initial.gene = genee))
     closeDialog()
 
-    doItAndPrint(paste("FrF2(", roww,"," ,facnums,",randomize=",randoms ,")", sep = ""))
-    justDoIt(paste(modelValue, "<-FrF2(", roww,"," ,facnums,",randomize=",randoms ,")", sep = ""))
+    doItAndPrint(paste("FrF2(", roww,"," ,facnums,",randomize=",randoms, ",generators =c(",genee,')',")", sep = ""))
+    doItAndPrint(paste(modelValue, "<-FrF2(", roww,"," ,facnums,",randomize=",randoms, ",generators =c(",genee,')' ,")", sep = ""))
     activeModel(modelValue)
 
     tkfocus(CommanderWindow())
   }
 
-  OKCancelHelp(helpSubject = "Anova", model = TRUE, reset = "fr.f2", apply = "fr.f2")
+  OKCancelHelp(helpSubject = "FrF2", model = TRUE, reset = "fr.f2", apply = "fr.f2")
 
   rowFrame <- tkframe(mainFrame)
   row <- tclVar(dialog.values$initial.row)
@@ -1038,6 +1041,10 @@ fr.f2 <- function () {
   random <- tclVar(dialog.values$initial.random)
   randomField <- ttkentry(randomFrame, width = "12", textvariable = random)
 
+  geneFrame <- tkframe(mainFrame)
+  gene <- tclVar(dialog.values$initial.gene)
+  geneField <- ttkentry(geneFrame, width = "12", textvariable = gene)
+
   tkgrid(labelRcmdr(mainFrame, text="  "), sticky = "nw")
   tkgrid(mainFrame, sticky="nw")
   tkgrid(labelRcmdr(modelFrame, text = gettextRcmdr("Enter name for model: ")),
@@ -1046,12 +1053,16 @@ fr.f2 <- function () {
   tkgrid(labelRcmdr(rowFrame, text = gettextRcmdr("행의 수"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
   tkgrid(labelRcmdr(facnumFrame, text = gettextRcmdr("인자의 수"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
   tkgrid(labelRcmdr(randomFrame, text = gettextRcmdr("랜덤화 / TRUE or FALSE"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(geneFrame, text = gettextRcmdr('generators /
+ex) 1/4 일부실시법 : "AB","AC", 1/8 일부실시법 : "AB","AC","BC" '), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
   tkgrid(rowField, sticky="w")
   tkgrid(facnumField, sticky="w")
   tkgrid(randomField, sticky="w")
+  tkgrid(geneField, sticky="w")
   tkgrid(rowFrame, labelRcmdr(mainFrame, text = " "), sticky = "nw")
   tkgrid(facnumFrame, labelRcmdr(mainFrame, text = " "), sticky = "nw")
   tkgrid(randomFrame, labelRcmdr(mainFrame, text = " "), sticky = "nw")
+  tkgrid(geneFrame, labelRcmdr(mainFrame, text = " "), sticky = "nw")
   tkgrid(buttonsFrame, sticky = "w")
   dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
 }
@@ -1588,10 +1599,10 @@ optwin <- function () {
 "))
     doItAndPrint(paste(response,"<-",.activeDataSet,'$',response, sep = ""))
     if (ranfacc == ""){
-      doItAndPrint(paste("optcom(data=",.activeDataSet,",fac =c(",facc,"),x=",'"',.activeDataSet,'$',response,'"',",alpha = ",alp,")", sep = ""))
+      doItAndPrint(paste("optcom(data=",.activeDataSet,",fac =c(",facc,"),x=",'"',response,'"',",alpha = ",alp,")", sep = ""))
     }
     if (ranfacc != ""){
-      doItAndPrint(paste("optcom(data=",.activeDataSet,",fac =c(",facc,"),ranfac =",'"',ranfacc,'"',",x=",'"',.activeDataSet,'$',response,'"',",alpha = ",alp,")", sep = ""))
+      doItAndPrint(paste("optcom(data=",.activeDataSet,",fac =c(",facc,"),ranfac =",'"',ranfacc,'"',",x=",'"',response,'"',",alpha = ",alp,")", sep = ""))
     }
 
     tkfocus(CommanderWindow())
@@ -1623,6 +1634,60 @@ optwin <- function () {
   tkgrid(alphaFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
   tkgrid(getFrame(groupBox), labelRcmdr(dataFrame, text="  "), getFrame(responseBox), sticky = "nw")
   tkgrid(dataFrame, sticky="w")
+  tkgrid(buttonsFrame, sticky = "w")
+  dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
+}
+
+perwin <- function () {
+  defaults <- list(initial.group = NULL, initial.response = NULL)
+  dialog.values <- getDialog("perwin", defaults)
+  initializeDialog(title = gettextRcmdr("3D 도표"))
+  mainFrame <- tkframe(top)
+  UpdateModelNumber()
+  modelName <- tclVar(paste("AnovaModel.", getRcmdr("modelNumber"),
+                            sep = ""))
+  modelFrame <- tkframe(top)
+  model <- ttkentry(modelFrame, width = "20", textvariable = modelName)
+  groupBox <- variableListBox(mainFrame, selectmode = "multiple",
+                              title = gettextRcmdr("Factors (pick one or more)"),
+                              initialSelection = varPosn(dialog.values$initial.group, "all"))
+  responseBox <- variableListBox(mainFrame, title = gettextRcmdr("Response Variable (pick one)"),
+                                 initialSelection = varPosn(dialog.values$initial.response, "all"))
+
+  onOK <- function() {
+    groups <- getSelection(groupBox)
+    response <- getSelection(responseBox)
+    modelValue <- trim.blanks(tclvalue(modelName))
+
+
+    if (length(groups) == 0) {
+      errorCondition(recall = perwin, message = gettextRcmdr("You must select at least one factor."))
+      return()}
+    if (length(response) == 0) {
+      errorCondition(recall = perwin, message = gettextRcmdr("You must select at least one factor."))
+      return()}
+    putDialog ("perwin", list (initial.group = groups, initial.response = response))
+    closeDialog()
+
+    .activeDataSet <- ActiveDataSet()
+    groups.list <- paste(paste(groups, sep = ""), collapse = ",")
+    doItAndPrint(paste("rsm(",response,"~SO(",groups.list,"),data=",.activeDataSet,")", sep = ""))
+    doItAndPrint(paste(modelValue, "<-rsm(",response,"~SO(",groups.list,"),data=",.activeDataSet,")", sep = ""))
+    {
+      groups.list <- paste(paste(groups, sep = ""), collapse = "+")
+      doItAndPrint(paste("persp(", modelValue,",~",groups.list,',contours=list(z="bottom")',")", sep = ""))
+    }
+    tkfocus(CommanderWindow())
+  }
+
+  OKCancelHelp(helpSubject = "Anova", model = TRUE, reset = "perwin", apply = "perwin")
+
+  tkgrid(labelRcmdr(mainFrame, text="  "), sticky = "nw")
+  tkgrid(mainFrame, sticky="nw")
+  tkgrid(getFrame(groupBox), labelRcmdr(mainFrame, text="  "), getFrame(responseBox), sticky = "nw")
+  tkgrid(labelRcmdr(modelFrame, text = gettextRcmdr("Enter name for model: ")),
+         model, sticky = "w")
+  tkgrid(modelFrame, sticky = "w")
   tkgrid(buttonsFrame, sticky = "w")
   dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
 }
