@@ -1738,7 +1738,7 @@ aliwin <- function () {
 
 disp2win <- function () {
   defaults <- list(initial.group = NULL, initial.response = NULL, initial.formul = "", initial.ranfac = "")
-  dialog.values <- getDialog("dispwin", defaults)
+  dialog.values <- getDialog("disp2win", defaults)
   initializeDialog(title = gettextRcmdr("산포 추정"))
   dataFrame <- tkframe(top)
   groupBox <- variableListBox(dataFrame, selectmode = "multiple",
@@ -1755,12 +1755,12 @@ disp2win <- function () {
     spp <- as.character(tclvalue(sp))
 
     if (length(groups) == 0) {
-      errorCondition(recall = dispwin, message = gettextRcmdr("You must select at least one factor."))
+      errorCondition(recall = disp2win, message = gettextRcmdr("You must select at least one factor."))
       return()}
     if (length(response) == 0) {
-      errorCondition(recall = dispwin, message = gettextRcmdr("You must select at least one factor."))
+      errorCondition(recall = disp2win, message = gettextRcmdr("You must select at least one factor."))
       return()}
-    putDialog ("dispwin", list (initial.group = groups, initial.response = response, initial.formul = formull, initial.ranfac = ranfacc))
+    putDialog ("disp2win", list (initial.group = groups, initial.response = response, initial.formul = formull, initial.ranfac = ranfacc))
     closeDialog()
 
     .activeDataSet <- ActiveDataSet()
@@ -1779,7 +1779,7 @@ disp2win <- function () {
     tkfocus(CommanderWindow())
   }
 
-  OKCancelHelp(helpSubject = "Anova", model = TRUE, reset = "dispwin", apply = "dispwin")
+  OKCancelHelp(helpSubject = "Anova", model = TRUE, reset = "disp2win", apply = "disp2win")
 
   formulFrame <- tkframe(dataFrame)
   formul <- tclVar(dialog.values$initial.formul)
