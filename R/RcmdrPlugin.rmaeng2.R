@@ -34,7 +34,7 @@ aanova <- function () {
     doItAndPrint(paste("aov.t(", .activeDataSet,"$",response,"~", formull,")", sep = ""))
     }
     if (ranfacc != ""){
-      doItAndPrint(paste("aov.t(", .activeDataSet,"$",response,"~", formull,",ranfac=",'"',ranfacc,'"',")", sep = ""))
+      doItAndPrint(paste("aov.t(", .activeDataSet,"$",response,"~", formull,",ranfac=",'"', .activeDataSet,"$",ranfacc,'"',")", sep = ""))
 
     }
     tkfocus(CommanderWindow())
@@ -1730,7 +1730,7 @@ aliwin <- function () {
 }
 
 disp2win <- function () {
-  defaults <- list(initial.group = NULL, initial.response = NULL, initial.formul = "", initial.ranfac = "")
+  defaults <- list(initial.group = NULL, initial.response = NULL, initial.formul = "", initial.ranfac = "", initial.rc = "TRUE")
   dialog.values <- getDialog("disp2win", defaults)
   initializeDialog(title = gettextRcmdr("산포 추정"))
   dataFrame <- tkframe(top)
@@ -1745,6 +1745,7 @@ disp2win <- function () {
     response <- getSelection(responseBox)
     formull <- as.character(tclvalue(formul))
     ranfacc <- as.character(tclvalue(ranfac))
+    rcc <- as.character(tclvalue(rc))
 
     if (length(groups) == 0) {
       errorCondition(recall = disp2win, message = gettextRcmdr("You must select at least one factor."))
@@ -1752,7 +1753,7 @@ disp2win <- function () {
     if (length(response) == 0) {
       errorCondition(recall = disp2win, message = gettextRcmdr("You must select at least one factor."))
       return()}
-    putDialog ("disp2win", list (initial.group = groups, initial.response = response, initial.formul = formull, initial.ranfac = ranfacc))
+    putDialog ("disp2win", list (initial.group = groups, initial.response = response, initial.formul = formull, initial.ranfac = ranfacc, initial.rc = rcc))
     closeDialog()
 
     .activeDataSet <- ActiveDataSet()
@@ -1762,10 +1763,10 @@ disp2win <- function () {
     doItAndPrint(paste(paste(rep(.activeDataSet),rep('$'),rep(groups),rep('<-'),rep("as.factor("),rep(.activeDataSet),rep('$'),groups,")", sep = ""), collapse = "
 "))
     if (ranfacc == ""){
-      doItAndPrint(paste("dispersion(", .activeDataSet,"$",response,"~", formull,",data=",.activeDataSet,",ranfac=NULL",",sp=FALSE",")", sep = ""))
+      doItAndPrint(paste("dispersion(", .activeDataSet,"$",response,"~", formull,",data=",.activeDataSet,",rc=",rcc,",ranfac=NULL",",sp=FALSE",")", sep = ""))
     }
     if (ranfacc != ""){
-      doItAndPrint(paste("dispersion(", .activeDataSet,"$",response,"~", formull,",data=",.activeDataSet,",ranfac=c(",ranfacc,')',",sp=FALSE",")", sep = ""))
+      doItAndPrint(paste("dispersion(", .activeDataSet,"$",response,"~", formull,",data=",.activeDataSet,",ranfac=c(",ranfacc,')',",rc=",rcc,",sp=FALSE",")", sep = ""))
     }
 
     tkfocus(CommanderWindow())
@@ -1776,6 +1777,10 @@ disp2win <- function () {
   formulFrame <- tkframe(dataFrame)
   formul <- tclVar(dialog.values$initial.formul)
   formulField <- ttkentry(formulFrame, width = "20", textvariable = formul)
+
+  ranfacFrame <- tkframe(dataFrame)
+  ranfac <- tclVar(dialog.values$initial.ranfac)
+  ranfacField <- ttkentry(ranfacFrame, width = "20", textvariable = ranfac)
 
   ranfacFrame <- tkframe(dataFrame)
   ranfac <- tclVar(dialog.values$initial.ranfac)
