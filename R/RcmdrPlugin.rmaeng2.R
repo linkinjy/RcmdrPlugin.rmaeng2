@@ -1675,6 +1675,7 @@ perwin <- function () {
     groups.list <- paste(paste(groups, sep = ""), collapse = ",")
     doItAndPrint(paste("rsm(",response,"~SO(",groups.list,"),data=",.activeDataSet,")", sep = ""))
     doItAndPrint(paste(modelValue, "<-rsm(",response,"~SO(",groups.list,"),data=",.activeDataSet,")", sep = ""))
+    doItAndPrint(paste("par(mfrow = c(2,3)",sep=""))
     {
       groups.list <- paste(paste(groups, sep = ""), collapse = "+")
       doItAndPrint(paste("persp(", modelValue,",~",groups.list,',contours="col",col="rainbow(40)"',")", sep = ""))
