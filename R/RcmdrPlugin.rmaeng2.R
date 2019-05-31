@@ -1328,9 +1328,9 @@ conto <- function () {
 }
 
 dispwin <- function () {
-  defaults <- list(initial.group = NULL, initial.response = NULL, initial.formul = "", initial.ranfac = "", initial.rc = "TRUE", initial.sp = "TRUE", initial.nest = "TRUE", initial.fac = 3)
+  defaults <- list(initial.group = NULL, initial.response = NULL, initial.formul = "", initial.ranfac = "", initial.rc = "TRUE", initial.nest = "TRUE", initial.fac = 3)
   dialog.values <- getDialog("dispwin", defaults)
-  initializeDialog(title = gettextRcmdr("산포 추정"))
+  initializeDialog(title = gettextRcmdr("분할법 산포 추정"))
   dataFrame <- tkframe(top)
   groupBox <- variableListBox(dataFrame, selectmode = "multiple",
                               title = gettextRcmdr("요인 및 반복 (하나 이상 선택)"),
@@ -1355,7 +1355,7 @@ dispwin <- function () {
       errorCondition(recall = dispwin, message = gettextRcmdr("You must select at least one factor."))
       return()}
     putDialog ("dispwin", list (initial.group = groups, initial.response = response, initial.formul = formull, initial.ranfac = ranfacc, initial.rc = rcc,
-                                initial.sp = spp, initial.nest = nestt, initial.fac = facc))
+                                initial.nest = nestt, initial.fac = facc))
     closeDialog()
 
     .activeDataSet <- ActiveDataSet()
@@ -1365,10 +1365,10 @@ dispwin <- function () {
     doItAndPrint(paste(paste(rep(.activeDataSet),rep('$'),rep(groups),rep('<-'),rep("as.factor("),rep(.activeDataSet),rep('$'),groups,")", sep = ""), collapse = "
 "))
     if (ranfacc == ""){
-      doItAndPrint(paste("dispersion(", .activeDataSet,"$",response,"~", formull,",data=",.activeDataSet,",ranfac=NULL",",rc=",rcc,",sp=",spp, ",nest=",nestt, ",fac=",facc,")", sep = ""))
+      doItAndPrint(paste("dispersion(", .activeDataSet,"$",response,"~", formull,",data=",.activeDataSet,",ranfac=NULL",",rc=",rcc,",sp=TRUE", ",nest=",nestt, ",fac=",facc,")", sep = ""))
     }
     if (ranfacc != ""){
-      doItAndPrint(paste("dispersion(", .activeDataSet,"$",response,"~", formull,",data=",.activeDataSet,",ranfac=c(",ranfacc,')',",rc=",rcc,",sp=",spp, ",nest=",nestt, ",fac=",facc,")", sep = ""))
+      doItAndPrint(paste("dispersion(", .activeDataSet,"$",response,"~", formull,",data=",.activeDataSet,",ranfac=c(",ranfacc,')',",rc=",rcc,",sp=TRUE", ",nest=",nestt, ",fac=",facc,")", sep = ""))
     }
     tkfocus(CommanderWindow())
   }
@@ -1387,10 +1387,6 @@ dispwin <- function () {
   rc <- tclVar(dialog.values$initial.rc)
   rcField <- ttkentry(rcFrame, width = "20", textvariable = rc)
 
-  spFrame <- tkframe(dataFrame)
-  sp <- tclVar(dialog.values$initial.sp)
-  spField <- ttkentry(spFrame, width = "20", textvariable = sp)
-
   nestFrame <- tkframe(dataFrame)
   nest <- tclVar(dialog.values$initial.nest)
   nestField <- ttkentry(nestFrame, width = "20", textvariable = nest)
@@ -1401,19 +1397,16 @@ dispwin <- function () {
 
   tkgrid(labelRcmdr(formulFrame, text = gettextRcmdr("Formula / ex) r*a*b*c"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
   tkgrid(labelRcmdr(ranfacFrame, text = gettextRcmdr('변량인자 / ex) "b","c"'), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
-  tkgrid(labelRcmdr(spFrame, text = gettextRcmdr('분할법 여부 / TRUE : 분할법 / FALSE : 분할법이 아니다 '), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
   tkgrid(labelRcmdr(nestFrame, text = gettextRcmdr('지분실험법 / TRUE : 지분실험법 / FALSE : 지분실험법이 아니다'), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
   tkgrid(labelRcmdr(rcFrame, text = gettextRcmdr("반복수 / TRUE : 일정 or FALSE : 일정하지 않다"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
   tkgrid(labelRcmdr(facFrame, text = gettextRcmdr("선택 : 1=단일분할법 일원배치, 2=단일분할법 이원배치, 3=이단분할법"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
   tkgrid(formulField, sticky="w")
   tkgrid(ranfacField, sticky="w")
-  tkgrid(spField, sticky="w")
   tkgrid(nestField, sticky="w")
   tkgrid(rcField, sticky="w")
   tkgrid(facField, sticky="w")
   tkgrid(formulFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
   tkgrid(ranfacFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
-  tkgrid(spFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
   tkgrid(nestFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
   tkgrid(rcFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
   tkgrid(facFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
@@ -1752,7 +1745,6 @@ disp2win <- function () {
     response <- getSelection(responseBox)
     formull <- as.character(tclvalue(formul))
     ranfacc <- as.character(tclvalue(ranfac))
-    spp <- as.character(tclvalue(sp))
 
     if (length(groups) == 0) {
       errorCondition(recall = disp2win, message = gettextRcmdr("You must select at least one factor."))
