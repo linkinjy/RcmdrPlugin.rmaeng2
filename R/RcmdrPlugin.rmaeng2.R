@@ -1441,13 +1441,16 @@ meanwin <- function () {
     .activeDataSet <- ActiveDataSet()
     groups.list <- paste(paste(groups, sep = ""), collapse = ", ")
     doItAndPrint(paste(paste(rep(groups),rep('<-'),rep(.activeDataSet),rep('$'),groups, sep = ""), collapse = "
-                       "))
+"))
+    doItAndPrint(paste(paste(rep(response),rep('<-'),rep(.activeDataSet),rep('$'),response, sep = "")))
+
     if (ranfacc == ""){
-      doItAndPrint(paste("mean.est(", .activeDataSet,"$",response,"~", formull,",data =",.activeDataSet,",factor =",'"',facc,'"',",alpha = ",alp,")", sep = ""))
+      doItAndPrint(paste("mean.est(", response,"~", formull,",data =",.activeDataSet,",factor =",'"',facc,'"',",alpha = ",alp,")", sep = ""))
     }
-    if (ranfac != ""){
-      doItAndPrint(paste("mean.est(", .activeDataSet,"$",response,"~", formull,",data =",.activeDataSet,",factor =",'"',facc,'"',",ranfac=",'"',ranfacc,'"',",alpha = ",alp,")", sep = ""))
+    if (ranfacc != ""){
+      doItAndPrint(paste("mean.est(", response,"~", formull,",data =",.activeDataSet,",factor =",'"',facc,'"',",ranfac=",'"',ranfacc,'"',",alpha = ",alp,")", sep = ""))
     }
+
     tkfocus(CommanderWindow())
   }
 
