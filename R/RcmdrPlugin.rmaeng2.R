@@ -463,6 +463,8 @@ nomeandiff <- function () {
 "))
     doItAndPrint(paste(paste(rep(groups),rep('<-'),rep(.activeDataSet),rep('$'),groups, sep = ""), collapse = "
 "))
+    doItAndPrint(paste(paste(rep(response),rep('<-'),rep(.activeDataSet),rep('$'),response, sep = ""), collapse = "
+"))
     if (rann!=""){
       doItAndPrint(paste("mean.diff(data=", .activeDataSet,",formula=",response,"~",formull,",method=",'"',methodd,'"',",ranfac=",'"',rann,'"',")", sep = ""))
     }
@@ -1688,6 +1690,47 @@ perwin <- function () {
   tkgrid(labelRcmdr(modelFrame, text = gettextRcmdr("Enter name for model: ")),
          model, sticky = "w")
   tkgrid(modelFrame, sticky = "w")
+  tkgrid(buttonsFrame, sticky = "w")
+  dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
+}
+
+aliwin <- function () {
+  defaults <- list(initial.rows = 16, initial.fac = 5)
+  dialog.values <- getDialog("aliwin", defaults)
+  initializeDialog(title = gettextRcmdr("별칭 구조"))
+  dataFrame <- tkframe(top)
+
+  onOK <- function() {
+    rowss <- tclvalue(rows)
+    facc <- tclvalue(fac)
+
+    putDialog ("aliwin", list (initial.rows = rowss,initial.fac = facc))
+    closeDialog()
+
+    doItAndPrint(paste("mk<-FrF2(",rowss,',',facc,')', sep = ""))
+    doItAndPrint(paste("mp<-runif(",rowss,',0,1)', sep = ""))
+    doItAndPrint(paste("aliases(lm(mp~(.)^4,data=mk))", sep = ""))
+    tkfocus(CommanderWindow())
+  }
+
+
+  OKCancelHelp(helpSubject = "aliases", model = TRUE, reset = "aliwin", apply = "aliwin")
+
+  facFrame <- tkframe(dataFrame)
+  fac <- tclVar(dialog.values$initial.fac)
+  facField <- ttkentry(facFrame, width = "20", textvariable = fac)
+
+  rowsFrame <- tkframe(dataFrame)
+  rows <- tclVar(dialog.values$initial.rows)
+  rowsField <- ttkentry(rowsFrame, width = "20", textvariable = rows)
+
+  tkgrid(labelRcmdr(facFrame, text = gettextRcmdr('요인의 수'), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(rowsFrame, text = gettextRcmdr("실행횟수"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(facField, sticky="w")
+  tkgrid(rowsField, sticky="w")
+  tkgrid(facFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
+  tkgrid(rowsFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
+  tkgrid(dataFrame, sticky="w")
   tkgrid(buttonsFrame, sticky = "w")
   dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
 }

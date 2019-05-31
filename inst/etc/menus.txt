@@ -58,7 +58,7 @@ item    comMenu       command         "산점도"                    sscatterplot  
 item    comMenu       command         "모평균차의 추정 "                    nomeandiff          ""                      ""
 item    comMenu       command         "모평균 추정"                    meanwin          ""                      ""
 item    comMenu       command         "최적 수준 조합"                    optwin          ""                      ""
-item    comMenu       command         "별칭 구조"                    optwin          ""                      ""
+item    comMenu       command         "별칭 구조"                    aliwin          ""                      ""
 item    rmaeng2Menu       cascade         "교락법 및 일부실시법"                                 comMenu                   ""                      ""
 menu    ortMenu       rmaeng2Menu         ""                                      ""                          ""                      ""
 item    ortMenu       command         "직교배열법 난수표"                    orth          ""                      ""
