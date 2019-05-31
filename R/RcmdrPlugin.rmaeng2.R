@@ -1328,7 +1328,7 @@ conto <- function () {
 }
 
 dispwin <- function () {
-  defaults <- list(initial.group = NULL, initial.response = NULL, initial.formul = "", initial.ranfac = "", initial.rc = "TRUE", initial.sp = "FALSE", initial.nest = "TRUE", initial.fac = 3)
+  defaults <- list(initial.group = NULL, initial.response = NULL, initial.formul = "", initial.ranfac = "", initial.rc = "TRUE", initial.sp = "TRUE", initial.nest = "TRUE", initial.fac = 3)
   dialog.values <- getDialog("dispwin", defaults)
   initializeDialog(title = gettextRcmdr("산포 추정"))
   dataFrame <- tkframe(top)
@@ -1731,6 +1731,71 @@ aliwin <- function () {
   tkgrid(rowsField, sticky="w")
   tkgrid(facFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
   tkgrid(rowsFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
+  tkgrid(dataFrame, sticky="w")
+  tkgrid(buttonsFrame, sticky = "w")
+  dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
+}
+
+disp2win <- function () {
+  defaults <- list(initial.group = NULL, initial.response = NULL, initial.formul = "", initial.ranfac = "")
+  dialog.values <- getDialog("dispwin", defaults)
+  initializeDialog(title = gettextRcmdr("산포 추정"))
+  dataFrame <- tkframe(top)
+  groupBox <- variableListBox(dataFrame, selectmode = "multiple",
+                              title = gettextRcmdr("요인 및 반복 (하나 이상 선택)"),
+                              initialSelection = varPosn(dialog.values$initial.group, "all"))
+  responseBox <- variableListBox(dataFrame, title = gettextRcmdr("Response Variable (pick one)"),
+                                 initialSelection = varPosn(dialog.values$initial.response, "all"))
+
+  onOK <- function() {
+    groups <- getSelection(groupBox)
+    response <- getSelection(responseBox)
+    formull <- as.character(tclvalue(formul))
+    ranfacc <- as.character(tclvalue(ranfac))
+    spp <- as.character(tclvalue(sp))
+
+    if (length(groups) == 0) {
+      errorCondition(recall = dispwin, message = gettextRcmdr("You must select at least one factor."))
+      return()}
+    if (length(response) == 0) {
+      errorCondition(recall = dispwin, message = gettextRcmdr("You must select at least one factor."))
+      return()}
+    putDialog ("dispwin", list (initial.group = groups, initial.response = response, initial.formul = formull, initial.ranfac = ranfacc))
+    closeDialog()
+
+    .activeDataSet <- ActiveDataSet()
+    groups.list <- paste(paste(groups, sep = ""), collapse = ", ")
+    doItAndPrint(paste(paste(rep(groups),rep('<-'),rep("as.factor("),rep(.activeDataSet),rep('$'),groups,")", sep = ""), collapse = "
+"))
+    doItAndPrint(paste(paste(rep(.activeDataSet),rep('$'),rep(groups),rep('<-'),rep("as.factor("),rep(.activeDataSet),rep('$'),groups,")", sep = ""), collapse = "
+"))
+    if (ranfacc == ""){
+      doItAndPrint(paste("dispersion(", .activeDataSet,"$",response,"~", formull,",data=",.activeDataSet,",ranfac=NULL",",sp=FALSE",")", sep = ""))
+    }
+    if (ranfacc != ""){
+      doItAndPrint(paste("dispersion(", .activeDataSet,"$",response,"~", formull,",data=",.activeDataSet,",ranfac=c(",ranfacc,')',",sp=FALSE",")", sep = ""))
+    }
+
+    tkfocus(CommanderWindow())
+  }
+
+  OKCancelHelp(helpSubject = "Anova", model = TRUE, reset = "dispwin", apply = "dispwin")
+
+  formulFrame <- tkframe(dataFrame)
+  formul <- tclVar(dialog.values$initial.formul)
+  formulField <- ttkentry(formulFrame, width = "20", textvariable = formul)
+
+  ranfacFrame <- tkframe(dataFrame)
+  ranfac <- tclVar(dialog.values$initial.ranfac)
+  ranfacField <- ttkentry(ranfacFrame, width = "20", textvariable = ranfac)
+
+  tkgrid(labelRcmdr(formulFrame, text = gettextRcmdr("Formula / ex) r*a*b*c"), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(labelRcmdr(ranfacFrame, text = gettextRcmdr('변량인자 / ex) "b","c"'), fg = getRcmdr("title.color"), font = "RcmdrTitleFont"), sticky = "w")
+  tkgrid(formulField, sticky="w")
+  tkgrid(ranfacField, sticky="w")
+  tkgrid(formulFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
+  tkgrid(ranfacFrame, labelRcmdr(dataFrame, text = " "), sticky = "nw")
+  tkgrid(getFrame(groupBox), labelRcmdr(dataFrame, text="  "), getFrame(responseBox), sticky = "nw")
   tkgrid(dataFrame, sticky="w")
   tkgrid(buttonsFrame, sticky = "w")
   dialogSuffix(use.tabs = FALSE, grid.buttons = TRUE)
