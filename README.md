@@ -1,6 +1,6 @@
 # RcmdrPlugin.rmaeng2
 
-The goal of RcmdrPlugin.rmaeng2 is to ...
+The RcmdrPlugin.rmaeng2 is free experimenal desingn package
 
 ## Installation
 
@@ -9,12 +9,3 @@ You can install the released version of RcmdrPlugin.rmaeng2 from [CRAN](https://
 ``` r
 install.packages("RcmdrPlugin.rmaeng2")
 ```
-
-## Example
-
-This is a basic example which shows you how to solve a common problem:
-
-``` r
-## basic example code
-```
-
